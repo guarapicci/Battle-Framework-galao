@@ -20,6 +20,8 @@ const PAUSE_MENU = preload("uid://cifkfj62fb1ho")
 
 @onready var match_scene: MatchScene = get_parent()
 
+var dialogueScene = load("res://UI/Dialogue/dialogue.tscn")
+
 # --- MOD EXPORTING STUFF ---
 
 ## Returns the name the stage will use internally to load files. 
