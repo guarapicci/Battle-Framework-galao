@@ -27,6 +27,8 @@ var speakerList := [null, null, null] ## List of what character each Speaker fil
 var animationPlaying = true ## Is an animation currently playing?
 var goingFast = false ## Is the text advancing at high speed?
 var justStarted = true ## Did we just start this thing? Prevents the first line from breaking.
+var afterMovingEdgeCase = false ## Did we just go through a movement edge case?
+var edgeCaseStoredPosition ## What's the position that our one speaker was just in?
 
 # THINGS THAT CAN BE EDITED DIRECTLY AFTER INSTANTIATION
 var backgroundShade = true ## Will the black background shade take effect? Can be modified before adding.
@@ -72,8 +74,16 @@ func _init():
 	addSpeaker("Tails", 0, 1, "Left", "Right")
 	addDialogue("Testing 1!", 3)
 	addDialogue("Testing 2!")
-	addSpeaker("Knuckles", 1, "Left", "Fade", "Right")
-	addDialogue("This text is really long and boring...", 1)
+	addSpeaker("Knuckles", 1, "Right", "Fade", "Right", false)
+	addSpeaker("Sonic", 0, "Right", "Left", "Right")
+	changeSpeaker("Sonic", 2, "Left")
+	addDialogue("Too bad Emerl's a goner.")
+	changeSpeaker("Tails", 1, "Left")
+	addDialogue("Really, Sonic?")
+	changeSpeaker("Sonic", 2, "Right")
+	addDialogue("I mean, c'mon, it's related, right?", 2)
+	changeSpeaker("Knuckles", 2, "Right")
+	addDialogue("Not cool, Sonic. You'd know better than to joke around like that.")
 
 func _ready():
 	if backgroundShade == true:
@@ -145,7 +155,15 @@ func setUpDialogue():
 			dialogueBox.texture.region.position.y = 48 * dialogueList[0][1].boxStyle
 			currentDialogue = dialogueList[0][1].dialogue
 		elif dialogueList[0][0] == "addSpeaker":
-			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4], dialogueList[0][5], dialogueList[0][6])
+			# This is an edge variable that disables initial character movement based on
+			# if the next variable also adds a speaker and if there is no delay between the two.
+			var movingEdgeCase = false
+			if dialogueList[1]:
+				if dialogueList[1][0] == "addSpeaker" and dialogueList[0][6] == false:
+					movingEdgeCase = true
+			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4], dialogueList[0][5], dialogueList[0][6], movingEdgeCase, afterMovingEdgeCase)
+		elif dialogueList[0][0] == "changeSpeaker":
+			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4])
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -187,7 +205,7 @@ func defineSpeaker(setName: String, setposeTexture: String, setPoses: Array = ["
 	var speaker = DialogueSpeaker.new(setName, setposeTexture, setPoses, setSound)
 	speakerMasterList.append(speaker)
 
-## This function is ued to add a Speaker to the current dialogue list.[br]
+## This function is used to add a Speaker to the current dialogue list.[br]
 ## [br]
 ## [b]setName[/b]: The name of the speaker you want to enter.[br]
 ## [b]setPose[/b]: The pose you want the speaker to be in.[br]
@@ -211,11 +229,10 @@ func addSpeaker(setName: String, setPose, setPosition, setEnterMode, setDirectio
 				setPosition = 1
 				
 	dialogueList.append(["addSpeaker", setName, setPose, setPosition, setEnterMode, setDirection, setDelay])
-	pass
 
 ## Adds a Speaker to the current scene.[br]
 ## [b]Not intended for coder use.[/b]
-func addSpeakerDefinition(setName: String, setPose, setPosition: int, setEnterMode, setDirection, setDelay: bool = true):
+func addSpeakerDefinition(setName: String, setPose, setPosition: int, setEnterMode, setDirection, setDelay: bool = true, setMovingEdgeCase: bool = false, setAfterMovingEdgeCase: bool = false):
 	animationPlaying = true
 	# First, check if this speaker actually exists.
 	var speakerIndex
@@ -238,20 +255,27 @@ func addSpeakerDefinition(setName: String, setPose, setPosition: int, setEnterMo
 	if speakerList[0] and speakerList[1] and speakerList[2]:
 		print("Cannot add any more characters!")
 		return
+		
+	# Check if a character with that name is already here.
+	for speakerListName in speakerList:
+		if speakerListName is Array:
+			if speakerListName[0] == setName:
+				print("There's already a character here named " + setName + "!")
+				return
 	
 	if speakerList[0] == null:
 		# Store the name in memory
-		speakerList[0] = [setName, setDirection]
+		speakerList[0] = [setName, setPosition]
 		speaker = speaker1
 		speakerInternalIndex = 0
 	if speakerList[1] == null and speaker == null:
 		# Store the name in memory
-		speakerList[1] = [setName, setDirection]
+		speakerList[1] = [setName, setPosition]
 		speaker = speaker2
 		speakerInternalIndex = 1
 	if speakerList[2] == null and speaker == null:
 		# Store the name in memory
-		speakerList[2] = [setName, setDirection]
+		speakerList[2] = [setName, setPosition]
 		speaker = speaker3
 		speakerInternalIndex = 2
 	
@@ -303,8 +327,11 @@ func addSpeakerDefinition(setName: String, setPose, setPosition: int, setEnterMo
 	# Set the speaker we want to move.
 	var speakerListIndex = 0
 	
+	# TODO: When a singular speaker is in the middle and you add 2 Speakers without delay,
+	# to the left and right sides, the middle speaker will shift to a direction, but then
+	# return back. Minor issue, but a fix would be nice.
 	if speakerCount <= 1:
-		speakerFinalPosition = 72
+		speakerFinalPosition = speakerInternalPosition.MIDDLE
 		speakerList[speakerInternalIndex][1] = speakerInternalPosition.MIDDLE
 	elif setPosition == speakerPosition.LEFT:
 		# TODO: replace this with possibilities
@@ -312,69 +339,105 @@ func addSpeakerDefinition(setName: String, setPose, setPosition: int, setEnterMo
 			3:
 				# Check which speaker we've gotta move.
 				for speakerMoveIndex in speakerList:
-					if speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_LEFT and speakerInternalIndex != speakerListIndex:
-						break
+					if (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_LEFT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE, setMovingEdgeCase)
+					elif (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_RIGHT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.RIGHT, setMovingEdgeCase)
+					speakerListIndex += 1
+				speakerFinalPosition = speakerInternalPosition.LEFT
 			2:
 				# TODO: replace with while loop that gets the index maybe?
 				for speakerMoveIndex in speakerList:
 					if speakerMoveIndex != null and speakerInternalIndex != speakerListIndex:
-						moveSpeaker(speakerListIndex, 129)
+						moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_RIGHT, setMovingEdgeCase)
 					speakerListIndex += 1
-				speakerFinalPosition = 21
+				speakerFinalPosition = speakerInternalPosition.MIDDLE_LEFT
 		pass
 	elif setPosition == speakerPosition.MIDDLE:
 		match speakerCount:
 			3:
-				pass
+				for speakerMoveIndex in speakerList:
+					if (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_LEFT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.LEFT, setMovingEdgeCase)
+					elif (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_RIGHT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.RIGHT, setMovingEdgeCase)
+					speakerListIndex += 1
+				speakerFinalPosition = speakerInternalPosition.MIDDLE
 			2:
 				for speakerMoveIndex in speakerList:
 					if speakerMoveIndex != null and speakerInternalIndex != speakerListIndex:
 						if setEnterMode.to_upper() == "LEFT":
-							moveSpeaker(speakerListIndex, 129)
-							speakerFinalPosition = 21
+							moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_RIGHT, setMovingEdgeCase)
+							speakerFinalPosition = speakerInternalPosition.MIDDLE_LEFT
 						else:
-							moveSpeaker(speakerListIndex, 21)
-							speakerFinalPosition = 129
+							moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_LEFT, setMovingEdgeCase)
+							speakerFinalPosition = speakerInternalPosition.MIDDLE_RIGHT
 					speakerListIndex += 1
 	elif setPosition == speakerPosition.RIGHT:
 		match speakerCount:
 			3:
-				pass
+				for speakerMoveIndex in speakerList:
+					if (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_LEFT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.LEFT, setMovingEdgeCase)
+					elif (speakerMoveIndex[1] == speakerInternalPosition.MIDDLE_RIGHT) and speakerInternalIndex != speakerListIndex:
+						moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE, setMovingEdgeCase)
+					speakerListIndex += 1
+				speakerFinalPosition = speakerInternalPosition.RIGHT
 			2:
 				for speakerMoveIndex in speakerList:
 					if speakerMoveIndex != null and speakerInternalIndex != speakerListIndex:
-						moveSpeaker(speakerListIndex, 21)
+						moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_LEFT, setMovingEdgeCase)
 					speakerListIndex += 1
-				speakerFinalPosition = 129
+				speakerFinalPosition = speakerInternalPosition.MIDDLE_RIGHT
+	speakerList[speakerInternalIndex][1] = speakerFinalPosition
 	
-	# And finally, set our delay.
-	# This tween is blank on purpose in order to set a delay.
-	if speakerCount > 1:
-		tween.tween_interval(40.0/60.0)
+	# All movement only happens if there is no edge case occuring.
+	if setMovingEdgeCase == false:
+		# And finally, set our delay.
+		# This tween is blank on purpose in order to set a delay.
+		# Also account for edge case.
+		if afterMovingEdgeCase == false and speakerCount > 1:
+			tween.tween_interval(40.0/60.0)
+		elif afterMovingEdgeCase == true:
+			for speakerValue in speakerList.size():
+				if edgeCaseStoredPosition == speakerList[speakerValue]:
+					tween.tween_interval(40.0/60.0)
+					break
 	
-	# Set where our speaker initially is depending on our mode, and where they're going.
-	if (setEnterMode is int and setEnterMode == speakerEnterMode.LEFT) or (setEnterMode is String and setEnterMode.to_upper() == "LEFT"):
-		speaker.position.x = -96
-		# Set trans and easing, then execute the animation.
-		tween.set_trans(Tween.TRANS_EXPO)
-		tween.set_ease(Tween.EASE_OUT)
-		tween.tween_property(speaker, "position", Vector2(speakerFinalPosition, speaker.position.y), 40.0/60.0)
+		# Set where our speaker initially is depending on our mode, and where they're going.
+		if (setEnterMode is int and setEnterMode == speakerEnterMode.LEFT) or (setEnterMode is String and setEnterMode.to_upper() == "LEFT"):
+			speaker.position.x = -96
+			# Set trans and easing, then execute the animation.
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(speaker, "position:x", speakerFinalPosition, 40.0/60.0)
+		elif (setEnterMode is int and setEnterMode == speakerEnterMode.RIGHT) or (setEnterMode is String and setEnterMode.to_upper() == "RIGHT"):
+			speaker.position.x = 240
+			# Set trans and easing, then execute the animation.
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(speaker, "position:x", speakerFinalPosition, 40.0/60.0)
+		elif (setEnterMode is int and setEnterMode == speakerEnterMode.FADE) or (setEnterMode is String and setEnterMode.to_upper() == "FADE"):
+			speaker.modulate = Color("ffffff00")
+			tween.tween_property(speaker, "position:x", speakerFinalPosition, 0)
+			tween.tween_property(speaker, "modulate", Color("ffffffff"), 40.0/60.0)
+		else:
+			tween.tween_property(speaker, "position:x", speakerFinalPosition, 0)
+		
 		tween.tween_callback(changeAnimationPlaying)
-	elif (setEnterMode is int and setEnterMode == speakerEnterMode.RIGHT) or (setEnterMode is String and setEnterMode.to_upper() == "RIGHT"):
-		speaker.position.x = 240
-		# Set trans and easing, then execute the animation.
-		tween.set_trans(Tween.TRANS_EXPO)
-		tween.set_ease(Tween.EASE_OUT)
-		tween.tween_property(speaker, "position", Vector2(speakerFinalPosition, speaker.position.y), 40.0/60.0)
-		tween.tween_callback(changeAnimationPlaying)
-	elif (setEnterMode is int and setEnterMode == speakerEnterMode.FADE) or (setEnterMode is String and setEnterMode.to_upper() == "FADE"):
-		speaker.modulate = Color("ffffff00")
-		tween.tween_property(speaker, "modulate", Color("ffffffff"), 40.0/60.0)
-		tween.tween_callback(changeAnimationPlaying)
-		speaker.position.x = speakerFinalPosition
 	else:
-		tween.tween_callback(changeAnimationPlaying)
-		speaker.position.x = speakerFinalPosition
+		# Find out the position of the one speaker on the board (if any).
+		# TODO: that
+		if speakerCount == 2:
+			for speakerValue in speakerList.size():
+				if speakerList[speakerValue][0] != setName and speakerList[speakerValue] != null:
+					edgeCaseStoredPosition = speakerList[speakerValue]
+					break
+		# Set our edge cases for two Speakers at once.
+		if setMovingEdgeCase == true:
+			afterMovingEdgeCase = true
+		elif setMovingEdgeCase == false and setAfterMovingEdgeCase == true:
+			afterMovingEdgeCase = false
 	
 	# Finally, let the program know it's ready to move on!
 	# We have to define it on a delay depending on if there's delay or not.
@@ -390,7 +453,7 @@ func changeAnimationPlaying():
 
 # Changes the speaker's location on the grid.
 # Not intended for general coder use.
-func moveSpeaker(setIndex: int, setPosition: int):
+func moveSpeaker(setIndex: int, setPosition: int, setMovingEdgeCase: bool = false):
 	# Match the speaker with our node.
 	var speaker
 	match setIndex:
@@ -401,16 +464,92 @@ func moveSpeaker(setIndex: int, setPosition: int):
 		_:
 			speaker = speaker3
 	
-	# Create and move our tween.
-	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_EXPO)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(speaker, "position", Vector2(setPosition, speaker.position.y), 40.0/60.0)
-	# TODO: set whatever index position this is to the setPosition
+	# Create and move our tween if we have no edge case.
+	if setMovingEdgeCase == false:
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_EXPO)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(speaker, "position:x", setPosition, 40.0/60.0)
+	
+	# Finally, save our position into memory.
+	speakerList[setIndex][1] = setPosition
+	
+func changeSpeaker(setName: String, setPose = -1, setDirection = -1, setDelay: bool = true):
+	dialogueList.append(["changeSpeaker", setName, setPose, setDirection, setDelay])
 
 # Changes the speaker's pose and/or direction.
-func changeSpeakerPose(setName: String, setChange: int, setPose: int = -1, setDirection: int = -1):
-	pass
+func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, setDelay: bool = true):
+	animationPlaying = true
+	
+	# First, check if our speaker exists.
+	var speakerIndex
+	for speakerValue in speakerList.size():
+		if speakerList[speakerValue][0] == setName:
+			speakerIndex = speakerValue
+			break
+	if speakerIndex == null:
+		print("There's no character with name " + setName + "!")
+		return
+	
+	# Set which speaker we're modifying.
+	var speaker
+	match speakerIndex:
+		0:
+			speaker = speaker1
+		1:
+			speaker = speaker2
+		_:
+			speaker = speaker3
+	
+	# Set our tween.
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN)
+	# Flip the speaker around.
+	tween.tween_property(speaker, "scale:x", 0, 10.0/60.0)
+	
+	# Mid-flip, set the direction and pose.
+	if (setDirection is int and setDirection == speakerDirection.LEFT) or (setDirection is String and setDirection.to_upper() == "LEFT"):
+		tween.tween_property(speaker, "flip_h", true, 0)
+	elif (setDirection is int and setDirection == speakerDirection.RIGHT) or (setDirection is String and setDirection.to_upper() == "RIGHT"):
+		tween.tween_property(speaker, "flip_h", false, 0)
+	
+	# Set the pose coordinates.
+	# Define which pose we're doing.
+	var poseIndex = null
+	if setPose is int:
+		# This is pretty easy.
+		poseIndex = setPose
+	elif setPose is String:
+		# This, however, is a little harder...
+		# We have to find exactly which pose it is.
+		# So, for each pose in our index...
+		for speakerPose in speakerMasterList[speakerIndex].poses.size():
+			# ...if the speaker pose name matches up with our given parameter...
+			if speakerMasterList[speakerIndex].poses[speakerPose] == setPose:
+				# ...then we set our pose Index.
+				poseIndex = speakerPose
+				break
+		
+	# Error handling.
+	if poseIndex == null:
+		print("Not a valid pose! Relying on default.")
+		poseIndex = 0
+	
+	# Set the pose coordinates.
+	tween.tween_property(speaker, "texture:region:position:x", (poseIndex * 96), 0)
+	
+	# Finish off the flip1
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(speaker, "scale:x", 1, 10.0/60.0)
+	tween.tween_callback(changeAnimationPlaying)
+	
+	# Finally, let the program know it's ready to move on!
+	# We have to define it on a delay depending on if there's delay or not.
+	if setDelay == false:
+		setUpDialogue()
+	else:
+		tween.tween_callback(setUpDialogue)
 
 # Animations for the textbox.
 func _on_animation_player_animation_finished(anim_name):

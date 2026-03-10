@@ -230,19 +230,25 @@ offset_right = -120.0
 offset_bottom = -45.0
 grow_horizontal = 2
 grow_vertical = 0
+pivot_offset = Vector2(48, 0)
 texture = SubResource("AtlasTexture_pgf0d")
+expand_mode = 1
 
 [node name="Speaker2" type="TextureRect" parent="CanvasLayerCharacters" unique_id=1301869179]
 offset_left = -96.0
 offset_top = 19.0
 offset_bottom = 115.0
+pivot_offset = Vector2(48, 0)
 texture = SubResource("AtlasTexture_aaxua")
+expand_mode = 1
 
 [node name="Speaker3" type="TextureRect" parent="CanvasLayerCharacters" unique_id=633659203]
 offset_left = -96.0
 offset_top = 19.0
 offset_bottom = 115.0
+pivot_offset = Vector2(48, 0)
 texture = SubResource("AtlasTexture_nx2qb")
+expand_mode = 1
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1389057305]
 offset = Vector2(0, 48)
