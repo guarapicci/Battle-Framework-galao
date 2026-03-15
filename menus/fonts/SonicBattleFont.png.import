@@ -1,0 +1,25 @@
+[remap]
+
+importer="font_data_image"
+type="FontFile"
+uid="uid://cvddlxw0mnsr8"
+path="res://.godot/imported/SonicBattleFont.png-b584c3ecc3fbd068b289abed1ccca4e0.fontdata"
+
+[deps]
+
+source_file="res://menus/fonts/SonicBattleFont.png"
+dest_files=["res://.godot/imported/SonicBattleFont.png-b584c3ecc3fbd068b289abed1ccca4e0.fontdata"]
+
+[params]
+
+character_ranges=PackedStringArray("0-31", "32-32 -4", "33-33 -6", "34-34 -4", "35-36 -1", "37-37 -3", "38-38 -1", "39-39 -6", "40-41 -4", "42-43 -2", "44-44 -5", "45-45 -2", "46-46 -6", "47-47 -3", "48-48 -1", "49-49 -4", "50-57 -1", "58-58 -6", "59-59 -5", "60-62 -2", "63-63 -1", "64-64", "65-72 -1", "73-73 -4", "74-76 -1", "77-77", "78-83 -1", "84-84 -2", "85-85 -1", "86-86 -2", "87-88 -1", "89-90 -2", "91-91 -4", "92-92 -3", "93-93 -4", "94-94 -2", "95-95 -1", "96-96 -5", "97-101 -2", "102-102 -3", "103-104 -2", "105-105 -6", "106-107 -3", "108-108 -6", "109-109 -1", "110-113 -2", "114-114 -3", "115-115 -2", "116-116 -3", "117-118 -2", "119-119 -1", "120-122 -2", "123-123 -3", "124-124 -6", "125-125 -3", "126-126 -2", "127-127")
+kerning_pairs=PackedStringArray()
+columns=32
+rows=4
+image_margin=Rect2i(0, 0, 0, 0)
+character_margin=Rect2i(0, 0, 0, 0)
+ascent=0
+descent=0
+fallbacks=[]
+compress=true
+scaling_mode=2
