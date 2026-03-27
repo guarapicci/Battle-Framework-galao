@@ -5,6 +5,7 @@
 [ext_resource type="FontFile" uid="uid://cvddlxw0mnsr8" path="res://menus/fonts/SonicBattleFont.png" id="3_hix8u"]
 [ext_resource type="Texture2D" uid="uid://g6swkwvdx8x2" path="res://characters/sonic/sprites/SonicDialoguePortraits.png" id="3_wf0ws"]
 [ext_resource type="AudioStream" uid="uid://bdgnhqv5dt6tf" path="res://assets/audio/sfx/Dialogue/DialogueRegular.wav" id="4_o83p3"]
+[ext_resource type="Texture2D" uid="uid://cqgre1b5lipgv" path="res://UI/Dialogue/DialogueMisc.png" id="5_bc1hc"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wf0ws"]
 atlas = ExtResource("2_hix8u")
@@ -29,6 +30,10 @@ region = Rect2(0, 0, 96, 96)
 [sub_resource type="AtlasTexture" id="AtlasTexture_o83p3"]
 atlas = ExtResource("2_hix8u")
 region = Rect2(0, 0, 240, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1u6s5"]
+atlas = ExtResource("5_bc1hc")
+region = Rect2(0, 0, 32, 32)
 
 [sub_resource type="Animation" id="Animation_bc1hc"]
 resource_name = "Exiting"
@@ -282,6 +287,12 @@ grow_vertical = 0
 theme_override_fonts/font = ExtResource("3_hix8u")
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
+
+[node name="DialoguePointer" type="TextureRect" parent="CanvasLayer" unique_id=1091803373]
+offset_left = -32.0
+offset_top = 85.0
+offset_bottom = 117.0
+texture = SubResource("AtlasTexture_1u6s5")
 
 [node name="CanvasLayerForeground" type="CanvasLayer" parent="." unique_id=1392079291]
 

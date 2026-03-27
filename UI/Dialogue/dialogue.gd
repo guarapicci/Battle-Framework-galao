@@ -54,6 +54,7 @@ var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The tal
 @onready var speaker2 = $CanvasLayerCharacters/Speaker2
 @onready var speaker3 = $CanvasLayerCharacters/Speaker3
 @onready var dialogueBox = $CanvasLayer/DialogueBox
+@onready var dialoguePointer = $CanvasLayer/DialoguePointer
 
 # TODO: make fadeouts a thing.
 # Fadeout length is usually 33 frames out of 60.
@@ -81,8 +82,11 @@ func _init():
 	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"])
 	
 	# test, delete once over with
-	addSpeaker(["Tails", 1, "Middle", "Left", "Right"], ["Sonic", 0, "Left", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Right"])
-	addDialogue("Testing 1!", 3)
+	addSpeaker(["Tails", 0, "Middle", "Left", "Right"])
+	addDialogue("Testing 1!", 0, "Tails")
+	addSpeaker(["Sonic", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
+	addDialogue("Hey, ya made it!", 1, "Sonic")
+	addDialogue("Not bad, kid!", 2, "Knuckles")
 
 func _ready():
 	if backgroundShade == true:
@@ -126,7 +130,7 @@ func _physics_process(delta):
 			setUpDialogue()
 		else:
 			# Speed up the text.
-			if dialogueList[0][0] == "Dialogue":
+			if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
 				goingFast = true
 
 func setUpDialogue():
@@ -135,8 +139,8 @@ func setUpDialogue():
 		justStarted = false
 	else:
 		dialogueList.remove_at(0)
-	# Remove speed-up mode.
-	goingFast = false
+	# Remove speed-up mode and the pointer.
+	dialoguePointer.position.x = -32
 	# If that's all the dialogue, remove the textbox.
 	if not dialogueList:
 		# TODO: add option for either just deleting it or
@@ -153,8 +157,55 @@ func setUpDialogue():
 			# Set the textbox style and dialogue.
 			dialogueBox.texture.region.position.y = 48 * dialogueList[0][1].boxStyle
 			currentDialogue = dialogueList[0][1].dialogue
+			if dialogueList[0][1].speaker:
+				animationPlaying = true
+				delayTimer = 22.0/60.0
+				
+				# TODO: Have the pointer flip depending on speaker direction,
+				# and have it find the speaker and track pointer's position based on speaker position.
+				# Set animation tweens for pointer, and disable animationPlaying after!
+				
+				# First, check if our speaker exists.
+				var speakerIndex
+				for speakerValue in speakerList.size():
+					if speakerList[speakerValue][0] == dialogueList[0][1].speaker:
+						speakerIndex = speakerValue
+						break
+				if speakerIndex == null:
+					print("There's no character with name " + dialogueList[0][1].speaker + "!")
+					return
+				
+				# Set which speaker we're referencing.
+				var speaker
+				match speakerIndex:
+					0:
+						speaker = speaker1
+					1:
+						speaker = speaker2
+					_:
+						speaker = speaker3
+				
+				# Get the speaker's references.
+				var startingPosition = speaker.position.x
+				var endingPosition = speaker.position.x
+				
+				if speaker.flip_h == true:
+					startingPosition += 27
+					endingPosition += 7
+					dialoguePointer.flip_h = true
+				else:
+					startingPosition += 37
+					endingPosition += 57
+					dialoguePointer.flip_h = false
+				
+				dialoguePointer.position.x = startingPosition
+				var tween = create_tween()
+				tween.set_ease(Tween.EASE_OUT)
+				tween.set_trans(Tween.TRANS_EXPO)
+				tween.tween_property(dialoguePointer, "position:x", endingPosition, (22.0/60.0))
+				tween.tween_callback(changeAnimationPlaying)
+				
 		elif dialogueList[0][0] == "addSpeaker":
-			
 			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "changeSpeaker":
 			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4])
