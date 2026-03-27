@@ -87,6 +87,7 @@ func _init():
 	addSpeaker(["Sonic", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
 	addDialogue("Hey, ya made it!", 1, "Sonic")
 	addDialogue("Not bad, kid!", 2, "Knuckles")
+	addDialogue("They seem happy.", 3)
 
 func _ready():
 	if backgroundShade == true:
@@ -140,6 +141,7 @@ func setUpDialogue():
 	else:
 		dialogueList.remove_at(0)
 	# Remove speed-up mode and the pointer.
+	goingFast = false
 	dialoguePointer.position.x = -32
 	# If that's all the dialogue, remove the textbox.
 	if not dialogueList:
