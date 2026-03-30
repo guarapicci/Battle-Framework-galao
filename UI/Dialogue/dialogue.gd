@@ -22,6 +22,12 @@ signal dialogue_ended
 @onready var soundBankTalk = $AudioStreamTalk
 @onready var soundBankExtra = $AudioStreamExtra
 
+# Labels for fadeouts.
+@onready var whiteForeground = $CanvasLayerForeground/WhiteForeground
+@onready var blackForeground = $CanvasLayerForeground/BlackForeground
+@onready var whiteBackground = $CanvasLayerBackground/WhiteBackground
+@onready var blackBackground = $CanvasLayerBackground/BlackBackground
+
 var delayTimer := 0.0 ## Time before the next sequence is printed.
 var currentDialogue: String = "" ## Dialogue storage in memory that's yet to be printed.
 var confirmOption = false ## Can the player advance the text?
@@ -69,25 +75,27 @@ func _init():
 	# Otherwise, you might have to define them every time you want to use them
 	# in a scene, and that's too slow...
 	# TODO: find out what dialogue sounds each character has
-	defineSpeaker("Sonic", "res://characters/sonic/sprites/SonicDialoguePortraits.png", ["Standard", "Thumbs Up", "Confused", "Determined"])
-	defineSpeaker("Tails", "res://characters/tails/sprites/TailsDialoguePortraits.png", ["Standard", "Worried", "Determined"])
-	defineSpeaker("Knuckles", "res://characters/knuckles/sprites/KnucklesDialoguePortraits.png", ["Standard", "Concerned", "Determined"])
-	defineSpeaker("Shadow", "res://characters/shadow/sprites/ShadowDialoguePortraits.png", ["Standard", "Intrigued", "Determined"])
-	defineSpeaker("Rouge", "res://characters/rouge/sprites/RougeDialoguePortraits.png", ["Standard", "Disgusted"])
-	defineSpeaker("Amy", "res://characters/amy/sprites/AmyDialoguePortraits.png", ["Standard", "Angry", "Happy", "Concerned"])
-	defineSpeaker("Cream", "res://characters/cream/sprites/CreamDialoguePortraits.png", ["Standard", "Sad", "Excited"])
-	defineSpeaker("Chaos Gamma", "res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png", ["Standard", "Identifying", "Standard (Guard Robo)"])
-	defineSpeaker("Chaos", "res://characters/chaos/sprites/ChaosDialoguePortraits.png", ["Standard"])
-	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened", "Intrigued (Phi)"])
-	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"])
+	defineSpeaker("Sonic", "res://characters/sonic/sprites/SonicDialoguePortraits.png", ["Standard", "Thumbs Up", "Confused", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	defineSpeaker("Tails", "res://characters/tails/sprites/TailsDialoguePortraits.png", ["Standard", "Worried", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	defineSpeaker("Knuckles", "res://characters/knuckles/sprites/KnucklesDialoguePortraits.png", ["Standard", "Concerned", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Shadow", "res://characters/shadow/sprites/ShadowDialoguePortraits.png", ["Standard", "Intrigued", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Rouge", "res://characters/rouge/sprites/RougeDialoguePortraits.png", ["Standard", "Disgusted"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
+	defineSpeaker("Amy", "res://characters/amy/sprites/AmyDialoguePortraits.png", ["Standard", "Angry", "Happy", "Concerned"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
+	defineSpeaker("Cream", "res://characters/cream/sprites/CreamDialoguePortraits.png", ["Standard", "Sad", "Excited"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
+	defineSpeaker("Chaos Gamma", "res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png", ["Standard", "Identifying", "Standard (Guard Robo)"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Chaos", "res://characters/chaos/sprites/ChaosDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened", "Intrigued (Phi)"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	
 	# test, delete once over with
 	addSpeaker(["Tails", 0, "Middle", "Left", "Right"])
-	addDialogue("Testing 1!", 0, "Tails")
-	addSpeaker(["Sonic", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
-	addDialogue("Hey, ya made it!", 1, "Sonic")
+	addDialogue("Testing, testing!", 0, "Tails")
+	addSpeaker(["Amy", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
+	addDialogue("Wow, this system is really cool!", 1, "Amy")
 	addDialogue("Not bad, kid!", 2, "Knuckles")
 	addDialogue("They seem happy.", 3)
+	toggleFade(1, 1)
+	toggleFade(1, 1)
 
 func _ready():
 	if backgroundShade == true:
@@ -159,11 +167,13 @@ func setUpDialogue():
 			# Set the textbox style and dialogue.
 			dialogueBox.texture.region.position.y = 48 * dialogueList[0][1].boxStyle
 			currentDialogue = dialogueList[0][1].dialogue
+			# Reset our talk sound.
+			talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav"
 			if dialogueList[0][1].speaker:
 				animationPlaying = true
 				delayTimer = 22.0/60.0
 				
-				# TODO: Have the pointer flip depending on speaker direction,
+				# Have the pointer flip depending on speaker direction,
 				# and have it find the speaker and track pointer's position based on speaker position.
 				# Set animation tweens for pointer, and disable animationPlaying after!
 				
@@ -191,6 +201,7 @@ func setUpDialogue():
 				var startingPosition = speaker.position.x
 				var endingPosition = speaker.position.x
 				
+				# Set up our speaker pointer.
 				if speaker.flip_h == true:
 					startingPosition += 27
 					endingPosition += 7
@@ -200,6 +211,7 @@ func setUpDialogue():
 					endingPosition += 57
 					dialoguePointer.flip_h = false
 				
+				# Animate our speaker pointer.
 				dialoguePointer.position.x = startingPosition
 				var tween = create_tween()
 				tween.set_ease(Tween.EASE_OUT)
@@ -207,10 +219,25 @@ func setUpDialogue():
 				tween.tween_property(dialoguePointer, "position:x", endingPosition, (22.0/60.0))
 				tween.tween_callback(changeAnimationPlaying)
 				
+				# Switch our talk sound.
+				var speakerMasterIndex
+				for speakerValue in speakerMasterList.size():
+					if speakerMasterList[speakerValue].name == dialogueList[0][1].speaker:
+						speakerMasterIndex = speakerValue
+						break
+				if speakerMasterIndex == null:
+					print("There's no character with name " + dialogueList[0][1] + "in the defined list of speakers!")
+					return
+				
+				talkSound = speakerMasterList[speakerMasterIndex].sound
+		
+			soundBankTalk.stream = load(talkSound)
 		elif dialogueList[0][0] == "addSpeaker":
 			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "changeSpeaker":
 			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4])
+		elif dialogueList[0][0] == "toggleFade":
+			toggleFadeDefinition(dialogueList[0][1], dialogueList[0][2])
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -875,6 +902,52 @@ func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, s
 		setUpDialogue()
 	else:
 		tween.tween_callback(setUpDialogue)
+		
+func toggleFade(fadeColor = "Black", fadeType = 0):
+	# Convert our fade colors to values.
+	if fadeColor is String:
+		if fadeColor.to_upper() == "WHITE":
+			fadeColor = 1
+		else:
+			fadeColor = 0
+	
+	if fadeType is String:
+		if fadeColor.to_upper() == "FOREGROUND":
+			fadeType = 1
+		else:
+			fadeType = 0
+	
+	# Append this to our dialogue list.
+	dialogueList.append(["toggleFade", fadeColor, fadeType])
+
+## Toggles what fades are currently on.
+func toggleFadeDefinition(fadeColor: int, fadeType: int):
+	# Set up our animation.
+	animationPlaying = true
+	var tween = create_tween()
+	
+	var fadeNode
+	
+	# Set which fade we're using.
+	if fadeColor == 1 and fadeType == 1:
+		fadeNode = whiteForeground
+	elif fadeColor == 1 and fadeType == 0:
+		fadeNode = whiteBackground
+	elif fadeColor == 0 and fadeType == 1:
+		fadeNode = blackForeground
+	else:
+		fadeNode = blackBackground
+	
+	# Animate our fades!
+	match fadeNode.modulate:
+		Color(1.0, 1.0, 1.0, 1.0):
+			tween.tween_property(fadeNode, "modulate", Color(1.0, 1.0, 1.0, 0.0), 33.0/60.0)
+		_:
+			tween.tween_property(fadeNode, "modulate", Color(1.0, 1.0, 1.0, 1.0), 33.0/60.0)
+	
+	tween.tween_callback(changeAnimationPlaying)
+	tween.tween_callback(setUpDialogue)
+	
 
 # Animations for the textbox.
 func _on_animation_player_animation_finished(anim_name):

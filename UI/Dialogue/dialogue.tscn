@@ -204,7 +204,7 @@ grow_vertical = 2
 texture = SubResource("AtlasTexture_wf0ws")
 
 [node name="BlackBackground" type="TextureRect" parent="CanvasLayerBackground" unique_id=800318061]
-visible = false
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -213,7 +213,7 @@ grow_vertical = 2
 texture = SubResource("AtlasTexture_wf0ws")
 
 [node name="WhiteBackground" type="TextureRect" parent="CanvasLayerBackground" unique_id=42725127]
-visible = false
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -296,8 +296,8 @@ texture = SubResource("AtlasTexture_1u6s5")
 
 [node name="CanvasLayerForeground" type="CanvasLayer" parent="." unique_id=1392079291]
 
-[node name="WhiteBackgroundFull" type="TextureRect" parent="CanvasLayerForeground" unique_id=1845993565]
-visible = false
+[node name="WhiteForeground" type="TextureRect" parent="CanvasLayerForeground" unique_id=1845993565]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -305,8 +305,8 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("AtlasTexture_bc1hc")
 
-[node name="BlackBackgroundFull" type="TextureRect" parent="CanvasLayerForeground" unique_id=811916857]
-visible = false
+[node name="BlackForeground" type="TextureRect" parent="CanvasLayerForeground" unique_id=811916857]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
