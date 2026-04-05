@@ -14,7 +14,8 @@ extends Control
 signal dialogue_ended
 
 # Labels for text.
-@onready var textLabel = $CanvasLayer/Text
+@onready var textLabel = $CanvasLayer/TextMask/Text
+@onready var textLabelFiller = $CanvasLayer/TextFiller
 @onready var animationTextbox = $AnimationPlayerTextbox
 @onready var animationShade = $AnimationPlayerShade
 
@@ -38,10 +39,14 @@ var animationPlaying = true ## Is an animation currently playing?
 var goingFast = false ## Is the text advancing at high speed?
 var justStarted = true ## Did we just start this thing? Prevents the first line from breaking.
 var noDelay = false ## Is our current speaker staying in position?
+var continueAmount: int = 0 ## How much times will the user have to manually continue the current strip of dialogue?
+var continueOption = false ## Can the player continue the current text?
+var continueLinesLeft: int = 2 ## How much lines are left before the text waits to continue?
 
 # THINGS THAT CAN BE EDITED DIRECTLY AFTER INSTANTIATION
 var backgroundShade = true ## Will the black background shade take effect? Can be modified before adding.
 
+# TODO: limit textBoxStyle to just "JAGGED" and "NARRATION". Apparently, the textBoxStyle rotates in a set pattern.
 enum textBoxStyle {JAGGED1, JAGGED2, JAGGED3, NARRATION} ## Determines shape of the textbox.
 enum speakerPosition {LEFT = 0, CENTER = 1, MIDDLE = 1, RIGHT = 2}
 enum speakerDirection {LEFT, RIGHT}
@@ -61,6 +66,8 @@ var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The tal
 @onready var speaker3 = $CanvasLayerCharacters/Speaker3
 @onready var dialogueBox = $CanvasLayer/DialogueBox
 @onready var dialoguePointer = $CanvasLayer/DialoguePointer
+@onready var continueIndicator = $CanvasLayer/ContinueIndicator
+@onready var continueAnimation = $CanvasLayer/ContinueIndicator/AnimationPlayer
 
 # TODO: make fadeouts a thing.
 # Fadeout length is usually 33 frames out of 60.
@@ -89,7 +96,7 @@ func _init():
 	
 	# test, delete once over with
 	addSpeaker(["Tails", 0, "Middle", "Left", "Right"])
-	addDialogue("Testing, testing!", 0, "Tails")
+	addDialogue("Testing, testing! This\ntext should go between\n3 lines! Okay, nevermind,\nI want it to be 5\nlines instead!", 0, "Tails")
 	addSpeaker(["Amy", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
 	addDialogue("Wow, this system is really cool!", 1, "Amy")
 	addDialogue("Not bad, kid!", 2, "Knuckles")
@@ -117,16 +124,45 @@ func _physics_process(delta):
 	
 	if currentDialogue.length() > 0:
 		if delayTimer <= 0:
-			# Prints the first letter into box
-			textLabel.text += currentDialogue.left(1)
-			if goingFast == true:
-				delayTimer = TEXTSPEEDFAST
+			# Prints the first letter into filler box in case of line overflow
+			var formerLineCount: int = textLabelFiller.get_line_count()
+			var continuing = false
+			textLabelFiller.text += currentDialogue.left(1)
+			if textLabelFiller.get_line_count() > formerLineCount:
+				continueLinesLeft -= 1
+				continuing = true
+			if continueLinesLeft == 0:
+				continueOption = true
+			
+			if continueOption == true:
+				continueIndicator.visible = true
+				continueAnimation.play("Default")
+			elif continuing == true and textLabel.get_line_count() > 1:
+				# Hide our continue indicator
+				continueIndicator.visible = false
+				continueAnimation.play("RESET")
+				# Move our line and pring a new line onto the existing one.
+				continuing = false
+				animationPlaying = true
+				var tween = create_tween()
+				tween.tween_property(textLabel, "position:y", textLabel.position.y - 16, 9.0/60.0)
+				# I don't know why the following line is required to not break stuff, but it is!
+				tween.tween_property(textLabel, "position:y", textLabel.position.y + 0, 0)
+				tween.tween_property(textLabel, "text", textLabel.text + currentDialogue.left(1), 0)
+				tween.tween_callback(changeAnimationPlaying)
+				currentDialogue = currentDialogue.erase(0)
+				delayTimer = 9.0/60.0
 			else:
-				delayTimer = TEXTSPEED
-			# Erases first letter of stored dialogue
-			currentDialogue = currentDialogue.erase(0)
-			# Play the dialogue sound
-			soundBankTalk.play()
+				# Prints the first letter into box
+				textLabel.text += currentDialogue.left(1)
+				if goingFast == true:
+					delayTimer = TEXTSPEEDFAST
+				else:
+					delayTimer = TEXTSPEED
+				# Erases first letter of stored dialogue
+				currentDialogue = currentDialogue.erase(0)
+				# Play the dialogue sound
+				soundBankTalk.play()
 		else:
 			delayTimer -= delta
 	elif animationPlaying == false:
@@ -137,6 +173,12 @@ func _physics_process(delta):
 		if confirmOption == true:
 			confirmOption = false
 			setUpDialogue()
+		elif continueOption == true:
+			continueOption = false
+			
+			# We have to increase this by 1 line because
+			# one of them will instantly be deleted upon continuation.
+			continueLinesLeft = 3
 		else:
 			# Speed up the text.
 			if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
@@ -156,7 +198,7 @@ func setUpDialogue():
 		# TODO: add option for either just deleting it or
 		# doing the regular dialogue exit
 		animationTextbox.play("Exiting")
-				# Taking away the background shade
+		# Taking away the background shade
 		if backgroundShade:
 			animationShade.play("Exiting")
 	else:
@@ -164,6 +206,14 @@ func setUpDialogue():
 		if dialogueList[0][0] == "Dialogue":
 			# Get the text currently in the box to disappear.
 			textLabel.text = ""
+			# Reset our box position.
+			textLabel.position.y = 7
+			# Set our filler text.
+			textLabelFiller.text = dialogueList[0][1].dialogue
+			# Reset our lines left for dialouge continuation.
+			continueLinesLeft = 2
+			# Reset filler text.
+			textLabelFiller.text = ""
 			# Set the textbox style and dialogue.
 			dialogueBox.texture.region.position.y = 48 * dialogueList[0][1].boxStyle
 			currentDialogue = dialogueList[0][1].dialogue
@@ -236,6 +286,8 @@ func setUpDialogue():
 			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "changeSpeaker":
 			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4])
+		elif dialogueList[0][0] == "removeSpeaker":
+			removeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "toggleFade":
 			toggleFadeDefinition(dialogueList[0][1], dialogueList[0][2])
 	
@@ -902,6 +954,21 @@ func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, s
 		setUpDialogue()
 	else:
 		tween.tween_callback(setUpDialogue)
+
+## This function is used to remove a Speaker from the current dialogue list.
+## It uses up to 3 arrays as parameters, each with their own sub-parameters.
+## In order, they are...[br]
+## [br]
+## [b]setName[/b]: The name of the speaker you wnt to exit.
+## [b]setExitMode[/b]: How you want the speaker to exit.
+## You can set this to be "Left" (exits to the left), "Right" (comes in from the right),
+## or "Fade" (fades out of the frame).
+func removeSpeakerDefinition(storedSpeaker1: Array, storedSpeaker2: Array = [], storedSpeaker3: Array = []):
+	dialogueList.append(["removeSpeaker", storedSpeaker1, storedSpeaker2, storedSpeaker3])
+
+## Removes a Speaker from the current scene.[br]
+## [b]Not intended for coder use.[/b]
+func removeSpeakerDefinition
 		
 func toggleFade(fadeColor = "Black", fadeType = 0):
 	# Convert our fade colors to values.

@@ -31,10 +31,6 @@ region = Rect2(0, 0, 96, 96)
 atlas = ExtResource("2_hix8u")
 region = Rect2(0, 0, 240, 48)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_jr753"]
-atlas = ExtResource("2_hix8u")
-region = Rect2(15, 14, 1, 1)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_1u6s5"]
 atlas = ExtResource("5_bc1hc")
 region = Rect2(0, 0, 32, 32)
@@ -242,7 +238,6 @@ modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("AtlasTexture_wf0ws")
@@ -316,30 +311,6 @@ grow_horizontal = 2
 grow_vertical = 0
 texture = SubResource("AtlasTexture_o83p3")
 
-[node name="TextMask" type="TextureRect" parent="CanvasLayer" unique_id=2035257107]
-clip_children = 1
-offset_left = 16.0
-offset_top = 120.0
-offset_right = 240.0
-offset_bottom = 156.0
-texture = SubResource("AtlasTexture_jr753")
-
-[node name="Text" type="Label" parent="CanvasLayer/TextMask" unique_id=1597970915]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -112.0
-offset_top = -29.0
-offset_right = 103.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_fonts/font = ExtResource("3_hix8u")
-theme_override_font_sizes/font_size = 8
-clip_text = true
-
 [node name="TextFiller" type="Label" parent="CanvasLayer" unique_id=1326666627]
 visible = false
 anchors_preset = 7
@@ -356,6 +327,21 @@ grow_vertical = 0
 theme_override_fonts/font = ExtResource("3_hix8u")
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
+
+[node name="Text" type="Label" parent="CanvasLayer" unique_id=1597970915]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -103.0
+offset_top = -33.0
+offset_right = 120.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_hix8u")
+theme_override_font_sizes/font_size = 8
 
 [node name="DialoguePointer" type="TextureRect" parent="CanvasLayer" unique_id=1091803373]
 offset_left = -32.0
