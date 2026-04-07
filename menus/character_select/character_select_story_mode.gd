@@ -22,13 +22,13 @@ func _process(delta: float) -> void:
 
 
 func on_character_selected(char_name: String ) -> void:
-	MatchSetup.stage_list = ["STORYMAP_3D"]
-	MatchSetup.cpu_players = 0
-	MatchSetup.human_players = 1
-	MatchSetup.single_window = false
-	MatchSetup.character_choices = {1:char_name}  
+	#MatchSetup.stage_list = ["STORYMAP_3D"]
+	#MatchSetup.cpu_players = 0
+	#MatchSetup.human_players = 1
+	#MatchSetup.single_window = false
+	#MatchSetup.character_choices = {1:char_name}  
 	
-	SceneChanger.change_scene_to_file("res://match_scene/match_scene.tscn")
+	SceneChanger.change_scene_to_file("res://levels/STORYMAP_3D/STORYMAP_3D.tscn")
 
 	pass
 
