@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://g6swkwvdx8x2" path="res://characters/sonic/sprites/SonicDialoguePortraits.png" id="3_wf0ws"]
 [ext_resource type="AudioStream" uid="uid://bdgnhqv5dt6tf" path="res://assets/audio/sfx/Dialogue/DialogueRegular.wav" id="4_o83p3"]
 [ext_resource type="Texture2D" uid="uid://cqgre1b5lipgv" path="res://UI/Dialogue/DialogueMisc.png" id="5_bc1hc"]
-[ext_resource type="Texture2D" uid="uid://cjk0n6n147cya" path="res://UI/Dialogue/DialogueYesNo.png" id="6_pgf0d"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wf0ws"]
 atlas = ExtResource("2_hix8u")
@@ -77,157 +76,6 @@ tracks/0/keys = {
 _data = {
 &"Default": SubResource("Animation_jr753"),
 &"RESET": SubResource("Animation_cliwj")
-}
-
-[sub_resource type="Animation" id="Animation_jpi7n"]
-resource_name = "Default"
-length = 0.001
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonNo:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [3]
-}
-
-[sub_resource type="Animation" id="Animation_m76yd"]
-resource_name = "Initial"
-length = 0.001
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonNo:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [3]
-}
-
-[sub_resource type="Animation" id="Animation_7v6mj"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonNo:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [3]
-}
-
-[sub_resource type="Animation" id="Animation_fuvh4"]
-resource_name = "Selected"
-length = 0.53333503
-loop_mode = 1
-step = 0.016666668
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonNo:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.26666668),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [5, 4]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_s4u1u"]
-_data = {
-&"Default": SubResource("Animation_jpi7n"),
-&"Initial": SubResource("Animation_m76yd"),
-&"RESET": SubResource("Animation_7v6mj"),
-&"Selected": SubResource("Animation_fuvh4")
-}
-
-[sub_resource type="Animation" id="Animation_nmad3"]
-resource_name = "Default"
-length = 0.001
-loop_mode = 1
-step = 0.016666668
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonYes:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-
-[sub_resource type="Animation" id="Animation_s4u1u"]
-resource_name = "Initial"
-length = 0.001
-step = 0.016666668
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonYes:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [1]
-}
-
-[sub_resource type="Animation" id="Animation_akd01"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonYes:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-
-[sub_resource type="Animation" id="Animation_kg8mf"]
-resource_name = "Selected"
-length = 0.53333503
-loop_mode = 1
-step = 0.016666668
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("../ButtonYes:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.26666668),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [2, 1]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_m76yd"]
-_data = {
-&"Default": SubResource("Animation_nmad3"),
-&"Initial": SubResource("Animation_s4u1u"),
-&"RESET": SubResource("Animation_akd01"),
-&"Selected": SubResource("Animation_kg8mf")
 }
 
 [sub_resource type="Animation" id="Animation_bc1hc"]
@@ -493,20 +341,21 @@ theme_override_font_sizes/font_size = 8
 clip_text = true
 
 [node name="TextFiller" type="Label" parent="CanvasLayer" unique_id=1326666627]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -104.0
-offset_top = -33.0
-offset_right = 111.0
-offset_bottom = -4.0
+offset_left = -142.5
+offset_top = -42.0
+offset_right = -15.5
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_fonts/font = ExtResource("3_hix8u")
 theme_override_font_sizes/font_size = 8
-clip_text = true
+autowrap_mode = 3
 
 [node name="DialoguePointer" type="TextureRect" parent="CanvasLayer" unique_id=1091803373]
 offset_left = -32.0
@@ -546,35 +395,9 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("AtlasTexture_wf0ws")
 
-[node name="ButtonNo" type="Sprite2D" parent="CanvasLayerForeground" unique_id=368552350]
-position = Vector2(240, 64)
-texture = ExtResource("6_pgf0d")
-offset = Vector2(16, 12)
-hframes = 3
-vframes = 2
-frame = 3
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayerForeground/ButtonNo" unique_id=2090214835]
-root_node = NodePath("../../ButtonYes")
-libraries/ = SubResource("AnimationLibrary_s4u1u")
-autoplay = &"Initial"
-
-[node name="ButtonYes" type="Sprite2D" parent="CanvasLayerForeground" unique_id=140835026]
-position = Vector2(240, 64)
-texture = ExtResource("6_pgf0d")
-offset = Vector2(16, 12)
-hframes = 3
-vframes = 2
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayerForeground/ButtonYes" unique_id=716852684]
-root_node = NodePath("../../ButtonNo")
-libraries/ = SubResource("AnimationLibrary_m76yd")
-autoplay = &"Initial"
-
 [node name="AnimationPlayerTextbox" type="AnimationPlayer" parent="." unique_id=938306969]
 libraries/ = SubResource("AnimationLibrary_wf0ws")
 autoplay = &"Initial"
-playback_auto_capture_transition_type = 5
 
 [node name="AnimationPlayerShade" type="AnimationPlayer" parent="." unique_id=1966176974]
 libraries/ = SubResource("AnimationLibrary_jr753")

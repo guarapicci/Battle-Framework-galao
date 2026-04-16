@@ -13,11 +13,21 @@ extends Control
 # Suggested by guarapicci.
 signal dialogue_ended
 
+# Y'know what? Let's also have signals for our YES/NO options.
+signal dialogue_pick_yes
+signal dialogue_pick_no
+
 # Labels for text.
 @onready var textLabel = $CanvasLayer/TextMask/Text
 @onready var textLabelFiller = $CanvasLayer/TextFiller
 @onready var animationTextbox = $AnimationPlayerTextbox
 @onready var animationShade = $AnimationPlayerShade
+
+# Labels for buttons.
+@onready var buttonYes = $CanvasLayerForeground/ButtonYes
+@onready var buttonNo = $CanvasLayerForeground/ButtonNo
+@onready var animationButtonYes = $CanvasLayerForeground/ButtonYes/AnimationPlayer
+@onready var animationButtonNo = $CanvasLayerForeground/ButtonNo/AnimationPlayer
 
 # Sound banks.
 @onready var soundBankTalk = $AudioStreamTalk
@@ -42,12 +52,13 @@ var noDelay = false ## Is our current speaker staying in position?
 var continueAmount: int = 0 ## How much times will the user have to manually continue the current strip of dialogue?
 var continueOption = false ## Can the player continue the current text?
 var continueLinesLeft: int = 2 ## How much lines are left before the text waits to continue?
+var choosing = false ## Is the player currently picking an option?
+var chooseOption = 1 ## What choice is the player hovering over? 0 is NO, 1 is YES.
+var nextTextbox = 0 ## What's the next jagged-type textbox that will be on display?
 
 # THINGS THAT CAN BE EDITED DIRECTLY AFTER INSTANTIATION
 var backgroundShade = true ## Will the black background shade take effect? Can be modified before adding.
 
-# TODO: limit textBoxStyle to just "JAGGED" and "NARRATION". Apparently, the textBoxStyle rotates in a set pattern.
-enum textBoxStyle {JAGGED1, JAGGED2, JAGGED3, NARRATION} ## Determines shape of the textbox.
 enum speakerPosition {LEFT = 0, CENTER = 1, MIDDLE = 1, RIGHT = 2}
 enum speakerDirection {LEFT, RIGHT}
 enum speakerEnterMode {LEFT, RIGHT, FADE}
@@ -81,7 +92,6 @@ func _init():
 	# If you wish to add more characters, set them up here!
 	# Otherwise, you might have to define them every time you want to use them
 	# in a scene, and that's too slow...
-	# TODO: find out what dialogue sounds each character has
 	defineSpeaker("Sonic", "res://characters/sonic/sprites/SonicDialoguePortraits.png", ["Standard", "Thumbs Up", "Confused", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	defineSpeaker("Tails", "res://characters/tails/sprites/TailsDialoguePortraits.png", ["Standard", "Worried", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	defineSpeaker("Knuckles", "res://characters/knuckles/sprites/KnucklesDialoguePortraits.png", ["Standard", "Concerned", "Determined"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
@@ -93,16 +103,20 @@ func _init():
 	defineSpeaker("Chaos", "res://characters/chaos/sprites/ChaosDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
 	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened", "Intrigued (Phi)"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	# NOTICE: Feel free to add your own speakers under this if you want to!
 	
 	# test, delete once over with
-	addSpeaker(["Tails", 0, "Middle", "Left", "Right"])
-	addDialogue("Testing, testing! This\ntext should go between\n3 lines! Okay, nevermind,\nI want it to be 5\nlines instead!", 0, "Tails")
-	addSpeaker(["Amy", 0, "Right", "Left", "Right"], ["Knuckles", 0, "Right", "Left", "Left"])
-	addDialogue("Wow, this system is really cool!", 1, "Amy")
-	addDialogue("Not bad, kid!", 2, "Knuckles")
-	addDialogue("They seem happy.", 3)
-	toggleFade(1, 1)
-	toggleFade(1, 1)
+	addSpeaker(["Amy", 0, "Left", "Left", "Right"], ["Emerl", 0, "Right", "Right", "Left"])
+	changeSpeaker("Amy", 3, "Right")
+	addDialogue("That's not... the... ThornRing,\nis it...?", 0, "Amy")
+	addOption()
+	addDialogue("It snew", 0, "Emerl")
+	changeSpeaker("Amy", 2, "Right")
+	addDialogue("what", 0, "Amy")
+	addDialogue("what do you mean", 0, "Amy")
+	## TODO: interchange the second and third parameters of addDialogue
+	# TODO: does NARRATION ever get used when a character is speaking?
+	# Vice versa - does JAGGED ever get used when a character is not speaking?
 
 func _ready():
 	if backgroundShade == true:
@@ -111,7 +125,10 @@ func _ready():
 	# Set the initial box style.
 	for dialogueValue in dialogueList.size():
 		if dialogueList[dialogueValue][0] == "Dialogue":
-			dialogueBox.texture.region.position.y = 48 * dialogueList[dialogueValue][1].boxStyle
+			if dialogueList[dialogueValue][1].boxStyle == 1:
+				dialogueBox.texture.region.position.y = 48 * 3
+			else:
+				dialogueBox.texture.region.position.y = 48 * nextTextbox
 			break
 
 func _physics_process(delta):
@@ -168,6 +185,23 @@ func _physics_process(delta):
 	elif animationPlaying == false:
 		confirmOption = true
 	
+	if choosing == true:
+		if Input.is_action_just_pressed("left1") and chooseOption == 0:
+			chooseOption = 1
+			soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialoguePick.wav")
+			soundBankExtra.play()
+		elif Input.is_action_just_pressed("right1") and chooseOption == 1:
+			chooseOption = 0
+			soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialoguePick.wav")
+			soundBankExtra.play()
+		
+		if chooseOption == 0:
+			animationButtonYes.play("Default")
+			animationButtonNo.play("Selected")
+		else:
+			animationButtonYes.play("Selected")
+			animationButtonNo.play("Default")
+	
 	# Speed up the textbox, advance it, or delete it.
 	if Input.is_action_just_pressed("attack1"):
 		if confirmOption == true:
@@ -179,10 +213,35 @@ func _physics_process(delta):
 			# We have to increase this by 1 line because
 			# one of them will instantly be deleted upon continuation.
 			continueLinesLeft = 3
+		elif choosing == true:
+			# Play our sound.
+			soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialogueSelect.wav")
+			soundBankExtra.play()
+			
+			# Get our options outta there!
+			choosing = false
+			var tween = create_tween()
+			# Set our ease and transition types.
+			tween.set_ease(Tween.EASE_OUT)
+			tween.set_trans(Tween.TRANS_EXPO)
+	
+			tween.tween_property(buttonYes, "position:x", -32, 20.0/60.0)
+			tween.parallel().tween_property(buttonNo, "position:x", -32, 20.0/60.0)
+			# Emit our signal, change animation playing status, and call our next dialogue input.
+			tween.tween_callback(emitChoosingSignal)
+			tween.tween_callback(changeAnimationPlaying)
+			tween.tween_callback(setUpDialogue)
 		else:
 			# Speed up the text.
 			if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
 				goingFast = true
+
+## Emits a signal for the option picked.
+func emitChoosingSignal():
+	if chooseOption == 1:
+		dialogue_pick_yes.emit()
+	else:
+		dialogue_pick_no.emit()
 
 func setUpDialogue():
 	# Remove the last used object if we just started.
@@ -215,7 +274,14 @@ func setUpDialogue():
 			# Reset filler text.
 			textLabelFiller.text = ""
 			# Set the textbox style and dialogue.
-			dialogueBox.texture.region.position.y = 48 * dialogueList[0][1].boxStyle
+			if dialogueList[0][1].boxStyle == 1:
+				dialogueBox.texture.region.position.y = 48 * 3
+			else:
+				dialogueBox.texture.region.position.y = 48 * nextTextbox
+				if nextTextbox >= 2:
+					nextTextbox = 0
+				else:
+					nextTextbox += 1
 			currentDialogue = dialogueList[0][1].dialogue
 			# Reset our talk sound.
 			talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav"
@@ -285,28 +351,35 @@ func setUpDialogue():
 		elif dialogueList[0][0] == "addSpeaker":
 			addSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "changeSpeaker":
-			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3], dialogueList[0][4])
+			changeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "removeSpeaker":
 			removeSpeakerDefinition(dialogueList[0][1], dialogueList[0][2], dialogueList[0][3])
 		elif dialogueList[0][0] == "toggleFade":
 			toggleFadeDefinition(dialogueList[0][1], dialogueList[0][2])
+		elif dialogueList[0][0] == "addOption":
+			addOptionDefinition()
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
 class DialogueEntry:
 	# Our info
 	var dialogue: String = ""
-	var boxStyle: int = textBoxStyle.JAGGED1
+	var boxStyle: int = 0
 	var speaker: String = ""
 	
 	# Parameterized constructor
-	func _init(setDialogue: String = "", setBoxStyle: int = textBoxStyle.JAGGED1, setSpeaker: String = ""):
+	func _init(setDialogue: String = "", setBoxStyle: int = 0, setSpeaker: String = ""):
 		dialogue = setDialogue
 		boxStyle = setBoxStyle
 		speaker = setSpeaker
 
 # Adds new dialogue to the queue using the class
-func addDialogue(setDialogue: String, setBoxStyle: int = textBoxStyle.JAGGED1, setSpeaker: String = ""):
+func addDialogue(setDialogue: String, setBoxStyle = 0, setSpeaker: String = ""):
+	if setBoxStyle is String:
+		if setBoxStyle.to_upper() == "NARRATION":
+			setBoxStyle = 1
+		else:
+			setBoxStyle = 0
 	# Instantiate a class
 	var dialogue = DialogueEntry.new(setDialogue, setBoxStyle, setSpeaker)
 	# Then, insert that object into our array!
@@ -327,8 +400,16 @@ class DialogueSpeaker:
 		sound = setSound
 
 # This defines a speaker.
-func defineSpeaker(setName: String, setposeTexture: String, setPoses: Array = ["Standard"], setSound: String = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav"):
-	var speaker = DialogueSpeaker.new(setName, setposeTexture, setPoses, setSound)
+## This function is used to define a Speaker for the global list.
+## If you want to do this, it's recommended to do it in the main dialogue file itself![br]
+## [br]
+## [b]setName[/b]: The name of the speaker you want to define.[br]
+## [b]setPoseTexture[/b]: The image file of the pose textures you want.
+## Each pose must be in a resolution of 96x96, and should be in one file, reading poses from left to right.[br]
+## [b]setPoses[/b]: The names of each individual pose. Make sure you name them all![br]
+## [b]setSound[/b]: The audio blip you want to play whenever the speaker is speaking.
+func defineSpeaker(setName: String, setPoseTexture: String, setPoses: Array = ["Standard"], setSound: String = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav"):
+	var speaker = DialogueSpeaker.new(setName, setPoseTexture, setPoses, setSound)
 	speakerMasterList.append(speaker)
 
 ## This function is used to add a Speaker to the current dialogue list.
@@ -851,11 +932,14 @@ func addSpeakerDefinition(storedSpeaker1: Array, storedSpeaker2: Array = [], sto
 # Dedicated function to change this value to false.
 # For tweens to do this after they end... why...?
 func changeAnimationPlaying():
-	animationPlaying = false
+	if animationPlaying == true:
+		animationPlaying = false
+	else:
+		animationPlaying = true
 
 # Changes the speaker's location on the grid.
 # Not intended for general coder use.
-func moveSpeaker(setIndex: int, setPosition: int):
+func moveSpeaker(setIndex: int, setPosition: int, setDelay: bool = false):
 	# Match the speaker with our node.
 	var speaker
 	match setIndex:
@@ -873,16 +957,19 @@ func moveSpeaker(setIndex: int, setPosition: int):
 		var tween = create_tween()
 		tween.set_trans(Tween.TRANS_EXPO)
 		tween.set_ease(Tween.EASE_OUT)
+		# Set a delay to account for removing speakers
+		if setDelay == true:
+			tween.tween_interval(40.0/60.0)
 		tween.tween_property(speaker, "position:x", setPosition, 40.0/60.0)
 	
 		# Finally, save our position into memory.
 		speakerList[setIndex][1] = setPosition
 	
-func changeSpeaker(setName: String, setPose = -1, setDirection = -1, setDelay: bool = true):
-	dialogueList.append(["changeSpeaker", setName, setPose, setDirection, setDelay])
+func changeSpeaker(setName: String, setPose = -1, setDirection = -1):
+	dialogueList.append(["changeSpeaker", setName, setPose, setDirection])
 
 # Changes the speaker's pose and/or direction.
-func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, setDelay: bool = true):
+func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1):
 	animationPlaying = true
 	
 	# First, check if our speaker exists.
@@ -949,11 +1036,7 @@ func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, s
 	tween.tween_callback(changeAnimationPlaying)
 	
 	# Finally, let the program know it's ready to move on!
-	# We have to define it on a delay depending on if there's delay or not.
-	if setDelay == false:
-		setUpDialogue()
-	else:
-		tween.tween_callback(setUpDialogue)
+	tween.tween_callback(setUpDialogue)
 
 ## This function is used to remove a Speaker from the current dialogue list.
 ## It uses up to 3 arrays as parameters, each with their own sub-parameters.
@@ -963,12 +1046,284 @@ func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1, s
 ## [b]setExitMode[/b]: How you want the speaker to exit.
 ## You can set this to be "Left" (exits to the left), "Right" (comes in from the right),
 ## or "Fade" (fades out of the frame).
-func removeSpeakerDefinition(storedSpeaker1: Array, storedSpeaker2: Array = [], storedSpeaker3: Array = []):
+func removeSpeaker(storedSpeaker1: Array, storedSpeaker2: Array = [], storedSpeaker3: Array = []):
 	dialogueList.append(["removeSpeaker", storedSpeaker1, storedSpeaker2, storedSpeaker3])
 
 ## Removes a Speaker from the current scene.[br]
 ## [b]Not intended for coder use.[/b]
-func removeSpeakerDefinition
+func removeSpeakerDefinition(storedSpeaker1: Array, storedSpeaker2: Array = [], storedSpeaker3: Array = []):
+	# NOTICE: There could probably be a way to optimize this for all three Speakers
+	# instead of having to repeat the same code three times. Optimizations are welcome,
+	# but not required.
+	
+	# REFERENCE:
+	# [0]: setName
+	# [1]: setExitMode
+	var setName1 = storedSpeaker1[0]
+	var setExitMode1 = storedSpeaker1[1]
+	
+	var setName2
+	var setExitMode2
+	
+	if storedSpeaker2 != []:
+		setName2 = storedSpeaker2[0]
+		setExitMode2 = storedSpeaker2[1]
+	
+	var setName3
+	var setExitMode3
+	
+	if storedSpeaker3 != []:
+		setName3 = storedSpeaker3[0]
+		setExitMode3 = storedSpeaker3[1]
+	
+	animationPlaying = true
+	
+	var speakersAdded: int
+	# How much speakers are we adding?
+	if storedSpeaker3 != []:
+		speakersAdded = 3
+	elif storedSpeaker2 != []:
+		speakersAdded = 2
+	else:
+		speakersAdded = 1
+	
+	# First, check if the speakers actually exist.
+	var speakerIndex1
+	for speakerValue in speakerList.size():
+		if speakerList[speakerValue][0] == setName1:
+			speakerIndex1 = speakerValue
+			break
+	if speakerIndex1 == null:
+		print("There's no character with name " + setName1 + "!")
+		return
+	
+	var speakerIndex2
+	if speakersAdded >= 3:
+		for speakerValue in speakerList.size():
+			if speakerList[speakerValue][0] == setName2:
+				speakerIndex2 = speakerValue
+				break
+		if speakerIndex2 == null:
+			print("There's no character with name " + setName2 + "!")
+			return
+	
+	var speakerIndex3
+	if speakersAdded == 3:
+		for speakerValue in speakerList.size():
+			if speakerList[speakerValue][0] == setName3:
+				speakerIndex3 = speakerValue
+				break
+		if speakerIndex3 == null:
+			print("There's no character with name " + setName3 + "!")
+			return
+	
+	# Variable where our texture'll be stored
+	var removedSpeaker1 = null
+	var removedSpeaker2 = null
+	var removedSpeaker3 = null
+	# Variable for our tween
+	var tween = create_tween()
+	
+	# Error handling
+	var currentSpeakerStorage = 0
+	for currentSpeaker in speakerList:
+		if currentSpeaker != null:
+			currentSpeakerStorage += 1
+	
+	if storedSpeaker3 != []:
+		currentSpeakerStorage -= 3
+	elif storedSpeaker2 != []:
+		currentSpeakerStorage -= 2
+	else:
+		currentSpeakerStorage -= 1
+	
+	if currentSpeakerStorage < 0:
+		print("Cannot remove any more characters!")
+		return
+	
+	# Removes our speakers from current memory.
+	if speakerList[0] != null:
+		if setName1 == speakerList[0][0] and removedSpeaker1 == null:
+			removedSpeaker1 = speaker1
+			speakerList[0] = null
+		elif setName2 == speakerList[0][0] and storedSpeaker2 != [] and removedSpeaker2 == null:
+			removedSpeaker2 = speaker1
+			speakerList[0] = null
+		elif setName3 == speakerList[0][0] and storedSpeaker3 != [] and removedSpeaker3 == null:
+			removedSpeaker3 = speaker1
+			speakerList[0] = null
+	if speakerList[1] != null:
+		if setName1 == speakerList[1][0] and removedSpeaker1 == null:
+			removedSpeaker1 = speaker2
+			speakerList[1] = null
+		elif setName2 == speakerList[1][0] and storedSpeaker2 != [] and removedSpeaker2 == null:
+			removedSpeaker2 = speaker2
+			speakerList[1] = null
+		elif setName3 == speakerList[1][0] and storedSpeaker3 != [] and removedSpeaker3 == null:
+			removedSpeaker3 = speaker2
+			speakerList[1] = null
+	if speakerList[2] != null:
+		if setName1 == speakerList[2][0] and removedSpeaker1 == null:
+			removedSpeaker1 = speaker3
+			speakerList[2] = null
+		elif setName2 == speakerList[2][0] and storedSpeaker2 != [] and removedSpeaker2 == null:
+			removedSpeaker2 = speaker3
+			speakerList[2] = null
+		elif setName3 == speakerList[2][0] and storedSpeaker3 != [] and removedSpeaker3 == null:
+			removedSpeaker3 = speaker3
+			speakerList[2] = null
+			
+	var speaker1Fading = false
+	var speaker2Fading = false
+	var speaker3Fading = false
+	
+	# Set our animations for our speakers depending on our mode.
+	if (setExitMode1 is int and setExitMode1 == speakerExitMode.LEFT) or (setExitMode1 is String and setExitMode1.to_upper() == "LEFT"):
+		# Set trans and easing, then execute the animation.
+		tween.set_trans(Tween.TRANS_EXPO)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(removedSpeaker1, "position:x", -96, 40.0/60.0)
+	elif (setExitMode1 is int and setExitMode1 == speakerExitMode.RIGHT) or (setExitMode1 is String and setExitMode1.to_upper() == "RIGHT"):
+		tween.set_trans(Tween.TRANS_EXPO)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(removedSpeaker1, "position:x", 240, 40.0/60.0)
+	elif (setExitMode1 is int and setExitMode1 == speakerExitMode.FADE) or (setExitMode1 is String and setExitMode1.to_upper() == "FADE"):
+		speaker1Fading = true
+	else:
+		tween.tween_property(removedSpeaker1, "position:x", -96, 0)
+	
+	if storedSpeaker2 != []:
+		tween.set_parallel(true)
+		if (setExitMode2 is int and setExitMode2 == speakerExitMode.LEFT) or (setExitMode2 is String and setExitMode2.to_upper() == "LEFT"):
+			# Set trans and easing, then execute the animation.
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(removedSpeaker2, "position:x", -96, 40.0/60.0)
+		elif (setExitMode2 is int and setExitMode2 == speakerExitMode.RIGHT) or (setExitMode2 is String and setExitMode2.to_upper() == "RIGHT"):
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(removedSpeaker2, "position:x", 240, 40.0/60.0)
+		elif (setExitMode2 is int and setExitMode2 == speakerExitMode.FADE) or (setExitMode2 is String and setExitMode2.to_upper() == "FADE"):
+			speaker2Fading = true
+		else:
+			tween.tween_property(removedSpeaker2, "position:x", -96, 0)
+	
+	if storedSpeaker3 != []:
+		if (setExitMode3 is int and setExitMode3 == speakerExitMode.LEFT) or (setExitMode3 is String and setExitMode3.to_upper() == "LEFT"):
+			# Set trans and easing, then execute the animation.
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(removedSpeaker3, "position:x", -96, 40.0/60.0)
+		elif (setExitMode3 is int and setExitMode3 == speakerExitMode.RIGHT) or (setExitMode3 is String and setExitMode3.to_upper() == "RIGHT"):
+			tween.set_trans(Tween.TRANS_EXPO)
+			tween.set_ease(Tween.EASE_OUT)
+			tween.tween_property(removedSpeaker3, "position:x", 240, 40.0/60.0)
+		elif (setExitMode3 is int and setExitMode3 == speakerExitMode.FADE) or (setExitMode3 is String and setExitMode3.to_upper() == "FADE"):
+			speaker3Fading = true
+		else:
+			tween.tween_property(removedSpeaker3, "position:x", -96, 0)
+	
+	# Set fades as last priority
+	if speaker1Fading == true:
+		tween.set_trans(Tween.TRANS_LINEAR)
+		tween.tween_property(removedSpeaker1, "modulate", Color("000000ff"), 40.0/60.0)
+	if speaker2Fading == true:
+		tween.set_trans(Tween.TRANS_LINEAR)
+		tween.tween_property(removedSpeaker2, "modulate", Color("000000ff"), 40.0/60.0)
+	if speaker3Fading == true:
+		tween.set_trans(Tween.TRANS_LINEAR)
+		tween.tween_property(removedSpeaker3, "modulate", Color("000000ff"), 40.0/60.0)
+		
+	tween.set_parallel(false)
+	
+	if speaker1Fading == true:
+		tween.tween_property(removedSpeaker1, "position:x", -96, 0)
+		tween.tween_property(removedSpeaker1, "modulate", Color("ffffffff"), 0)
+	if speaker2Fading == true:
+		tween.tween_property(removedSpeaker2, "position:x", -96, 0)
+		tween.tween_property(removedSpeaker2, "modulate", Color("ffffffff"), 0)
+	if speaker3Fading == true:
+		tween.tween_property(removedSpeaker3, "position:x", -96, 0)
+		tween.tween_property(removedSpeaker3, "modulate", Color("ffffffff"), 0)
+	
+	# So first, we have to count how much speakers there are in the first place.
+	var speakerCount: int = 0
+	for speakerCountIndex in speakerList:
+		if speakerCountIndex != null:
+			speakerCount += 1
+	
+	# Set the speaker we want to move.
+	var speakerListIndex = 0
+	
+	# Edge case for the middle speaker to move according to where the rightmost or leftmost speaker moves.
+	var toLeft = false
+	var toRight = false
+	var middleIndex
+	
+	if speakerCount == 2:
+		# One speaker on left, one speaker on right
+		for speakerMoveIndex in speakerList:
+			if speakerMoveIndex != null:
+				if speakerList[speakerListIndex][1] == speakerInternalPosition.LEFT:
+					moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_LEFT, true)
+					toRight = true
+				elif speakerList[speakerListIndex][1] == speakerInternalPosition.RIGHT:
+					moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE_RIGHT, true)
+					toLeft = true
+				elif speakerList[speakerListIndex][1] == speakerInternalPosition.MIDDLE:
+					middleIndex = speakerListIndex
+				
+				if middleIndex and toRight == true:
+					moveSpeaker(middleIndex, speakerInternalPosition.MIDDLE_RIGHT, true)
+					middleIndex = null
+				elif middleIndex and toLeft == true:
+					moveSpeaker(middleIndex, speakerInternalPosition.MIDDLE_LEFT,true)
+					middleIndex = null
+				
+			speakerListIndex += 1
+	elif speakerCount == 1:
+		# One speaker on middle
+		for speakerMoveIndex in speakerList:
+			if speakerMoveIndex != null:
+				moveSpeaker(speakerListIndex, speakerInternalPosition.MIDDLE, true)
+			speakerListIndex += 1
+	elif speakerCount == 0:
+		noDelay = true
+	
+	# Set our delay, assuming our speakers don't just stay where they are.
+	if noDelay == false:
+		tween.tween_interval(40.0/60.0)
+	
+	tween.tween_callback(changeAnimationPlaying)
+	noDelay = false
+	
+	# Finally, let the program know it's ready to move on!
+	tween.tween_callback(setUpDialogue)
+
+## This adds a YES/NO option to your dialogue.
+func addOption():
+	dialogueList.append(["addOption"])
+
+func addOptionDefinition():
+	animationPlaying = true
+	
+	var tween = create_tween()
+	# Set our ease and transition types.
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_EXPO)
+	
+	tween.tween_property(buttonYes, "position:x", 72, 30.0/60.0)
+	tween.parallel().tween_property(buttonNo, "position:x", 136, 30.0/60.0)
+	tween.tween_callback(changeChoosing)
+	chooseOption = 1
+
+## Sets choosing to the opposite value of what it currently is.[br]
+## [b]Not intended for coder use.[/b]
+func changeChoosing():
+	if choosing == false:
+		choosing = true
+	else:
+		choosing = false
 		
 func toggleFade(fadeColor = "Black", fadeType = 0):
 	# Convert our fade colors to values.
