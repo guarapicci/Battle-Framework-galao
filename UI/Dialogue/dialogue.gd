@@ -107,16 +107,15 @@ func _init():
 	
 	# test, delete once over with
 	addSpeaker(["Amy", 0, "Left", "Left", "Right"], ["Emerl", 0, "Right", "Right", "Left"])
-	changeSpeaker("Amy", 3, "Right")
-	addDialogue("That's not... the... ThornRing,\nis it...?", 0, "Amy")
+	changeSpeaker("Amy", "Concerned", "Right")
+	# TODO: fix changeSpeaker poses grabbing based on current index instead of master index
+	addDialogue("That's not... the... ThornRing,\nis it...?", "Amy")
 	addOption()
-	addDialogue("It snew", 0, "Emerl")
+	addDialogue("It snew", "Emerl")
 	changeSpeaker("Amy", 2, "Right")
-	addDialogue("what", 0, "Amy")
-	addDialogue("what do you mean", 0, "Amy")
-	## TODO: interchange the second and third parameters of addDialogue
-	# TODO: does NARRATION ever get used when a character is speaking?
-	# Vice versa - does JAGGED ever get used when a character is not speaking?
+	addDialogue("what", "Amy")
+	addDialogue("what do you mean", "Amy")
+	addDialogue("I'm listening.")
 
 func _ready():
 	if backgroundShade == true:
@@ -125,7 +124,7 @@ func _ready():
 	# Set the initial box style.
 	for dialogueValue in dialogueList.size():
 		if dialogueList[dialogueValue][0] == "Dialogue":
-			if dialogueList[dialogueValue][1].boxStyle == 1:
+			if dialogueList[dialogueValue][1].speaker == "":
 				dialogueBox.texture.region.position.y = 48 * 3
 			else:
 				dialogueBox.texture.region.position.y = 48 * nextTextbox
@@ -274,7 +273,7 @@ func setUpDialogue():
 			# Reset filler text.
 			textLabelFiller.text = ""
 			# Set the textbox style and dialogue.
-			if dialogueList[0][1].boxStyle == 1:
+			if dialogueList[0][1].speaker == "":
 				dialogueBox.texture.region.position.y = 48 * 3
 			else:
 				dialogueBox.texture.region.position.y = 48 * nextTextbox
@@ -364,24 +363,17 @@ func setUpDialogue():
 class DialogueEntry:
 	# Our info
 	var dialogue: String = ""
-	var boxStyle: int = 0
 	var speaker: String = ""
 	
 	# Parameterized constructor
-	func _init(setDialogue: String = "", setBoxStyle: int = 0, setSpeaker: String = ""):
+	func _init(setDialogue: String = "", setSpeaker: String = ""):
 		dialogue = setDialogue
-		boxStyle = setBoxStyle
 		speaker = setSpeaker
 
 # Adds new dialogue to the queue using the class
-func addDialogue(setDialogue: String, setBoxStyle = 0, setSpeaker: String = ""):
-	if setBoxStyle is String:
-		if setBoxStyle.to_upper() == "NARRATION":
-			setBoxStyle = 1
-		else:
-			setBoxStyle = 0
+func addDialogue(setDialogue: String, setSpeaker: String = ""):
 	# Instantiate a class
-	var dialogue = DialogueEntry.new(setDialogue, setBoxStyle, setSpeaker)
+	var dialogue = DialogueEntry.new(setDialogue, setSpeaker)
 	# Then, insert that object into our array!
 	dialogueList.append(["Dialogue", dialogue]);
 
@@ -972,13 +964,25 @@ func changeSpeaker(setName: String, setPose = -1, setDirection = -1):
 func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1):
 	animationPlaying = true
 	
-	# First, check if our speaker exists.
+	# First, check if our speaker exists in our current scene.
 	var speakerIndex
 	for speakerValue in speakerList.size():
 		if speakerList[speakerValue][0] == setName:
 			speakerIndex = speakerValue
 			break
 	if speakerIndex == null:
+		print("There's no character with name " + setName + "!")
+		return
+	
+	# Next, check where the index is in our Master List for poses.
+	# Chances are that we don't need the error check here, but it's still nice
+	# to have just in case.
+	var speakerPoseIndex
+	for speakerValue in speakerMasterList.size():
+		if speakerMasterList[speakerValue].name == setName:
+			speakerPoseIndex = speakerValue
+			break
+	if speakerPoseIndex == null:
 		print("There's no character with name " + setName + "!")
 		return
 	
@@ -1015,9 +1019,9 @@ func changeSpeakerDefinition(setName: String, setPose = -1, setDirection = -1):
 		# This, however, is a little harder...
 		# We have to find exactly which pose it is.
 		# So, for each pose in our index...
-		for speakerPose in speakerMasterList[speakerIndex].poses.size():
+		for speakerPose in speakerMasterList[speakerPoseIndex].poses.size():
 			# ...if the speaker pose name matches up with our given parameter...
-			if speakerMasterList[speakerIndex].poses[speakerPose] == setPose:
+			if speakerMasterList[speakerPoseIndex].poses[speakerPose] == setPose:
 				# ...then we set our pose Index.
 				poseIndex = speakerPose
 				break
