@@ -476,37 +476,34 @@ offset_right = 240.0
 offset_bottom = 156.0
 texture = SubResource("AtlasTexture_jr753")
 
-[node name="Text" type="Label" parent="CanvasLayer/TextMask" unique_id=1597970915]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -112.0
-offset_top = -29.0
-offset_right = 103.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_fonts/font = ExtResource("3_hix8u")
-theme_override_font_sizes/font_size = 8
-clip_text = true
+[node name="Text" type="RichTextLabel" parent="CanvasLayer/TextMask" unique_id=596393171]
+layout_mode = 0
+offset_top = 7.0
+offset_right = 215.0
+offset_bottom = 36.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_constants/line_separation = 3
+theme_override_fonts/normal_font = ExtResource("3_hix8u")
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
 
-[node name="TextFiller" type="Label" parent="CanvasLayer" unique_id=1326666627]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -104.0
-offset_top = -33.0
-offset_right = 111.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_fonts/font = ExtResource("3_hix8u")
-theme_override_font_sizes/font_size = 8
-clip_text = true
+[node name="TextFiller" type="RichTextLabel" parent="CanvasLayer" unique_id=2032051718]
+visible = false
+offset_left = 16.0
+offset_top = 134.0
+offset_right = 231.0
+offset_bottom = 163.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_constants/line_separation = 3
+theme_override_fonts/normal_font = ExtResource("3_hix8u")
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
 
 [node name="DialoguePointer" type="TextureRect" parent="CanvasLayer" unique_id=1091803373]
 offset_left = -32.0

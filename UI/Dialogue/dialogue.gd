@@ -80,8 +80,9 @@ var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The tal
 @onready var continueIndicator = $CanvasLayer/ContinueIndicator
 @onready var continueAnimation = $CanvasLayer/ContinueIndicator/AnimationPlayer
 
-# TODO: make fadeouts a thing.
-# Fadeout length is usually 33 frames out of 60.
+# TODO: fix colors and support colors.
+# The text appears white by default for some reason...
+# Also test if changing the colors midway through works as intended.
 
 # Default is 5 frames.
 const TEXTSPEED = (1.0/60.0) * 5.0
@@ -114,7 +115,7 @@ func _init():
 	addDialogue("It snew", "Emerl")
 	changeSpeaker("Amy", 2, "Right")
 	addDialogue("what", "Amy")
-	addDialogue("what do you mean", "Amy")
+	addDialogue("what do you [color=red]mean", "Amy")
 	addDialogue("I'm listening.")
 
 func _ready():
@@ -140,6 +141,12 @@ func _physics_process(delta):
 	
 	if currentDialogue.length() > 0:
 		if delayTimer <= 0:
+			# Checks for colored text and prints it instantly.
+			if currentDialogue.left(7) == "[color=":
+				textLabelFiller.text += currentDialogue.left(currentDialogue.find("]") + 1)
+				textLabel.text += currentDialogue.left(currentDialogue.find("]") + 1)
+				currentDialogue = currentDialogue.erase(0, currentDialogue.find("]") + 1)
+			
 			# Prints the first letter into filler box in case of line overflow
 			var formerLineCount: int = textLabelFiller.get_line_count()
 			var continuing = false
