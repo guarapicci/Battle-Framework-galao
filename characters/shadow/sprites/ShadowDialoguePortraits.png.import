@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://dnq7eclf21ip7"
+path="res://.godot/imported/ShadowDialoguePortraits.png-aeb667db7088f71ba427385b1cc2aa8e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://characters/shadow/sprites/ShadowDialoguePortraits.png"
+dest_files=["res://.godot/imported/ShadowDialoguePortraits.png-aeb667db7088f71ba427385b1cc2aa8e.ctex"]
 
 [params]
 

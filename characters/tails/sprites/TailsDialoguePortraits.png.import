@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://5q2ck62p2gvi"
+path="res://.godot/imported/TailsDialoguePortraits.png-815aa51660e23fe0f51117172dd3be8f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://characters/tails/sprites/TailsDialoguePortraits.png"
+dest_files=["res://.godot/imported/TailsDialoguePortraits.png-815aa51660e23fe0f51117172dd3be8f.ctex"]
 
 [params]
 
