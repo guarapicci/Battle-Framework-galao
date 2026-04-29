@@ -39,6 +39,10 @@ signal dialogue_pick_no
 @onready var whiteBackground = $CanvasLayerBackground/WhiteBackground
 @onready var blackBackground = $CanvasLayerBackground/BlackBackground
 
+# Label for speaker effects.
+@onready var spriteSpeakerEffect = $CanvasLayerForeground/SpeakerEffects
+@onready var animationSpeakerEffect = $CanvasLayerForeground/SpeakerEffects/AnimationPlayer
+
 var delayTimer := 0.0 ## Time before the next sequence is printed.
 var currentDialogue: String = "" ## Dialogue storage in memory that's yet to be printed.
 var confirmOption = false ## Can the player advance the text?
@@ -58,6 +62,8 @@ var nextTextbox = 0 ## What's the next jagged-type textbox that will be on displ
 
 # THINGS THAT CAN BE EDITED DIRECTLY AFTER INSTANTIATION
 var backgroundShade = true ## Will the black background shade take effect? Can be modified before adding.
+var immediateEnter = false ## Will the dialogue immediately appear without animation?
+var immediateExit = false ## Will the dialogue immediately end without animation?
 
 enum speakerPosition {LEFT = 0, CENTER = 1, MIDDLE = 1, RIGHT = 2}
 enum speakerDirection {LEFT, RIGHT}
@@ -88,7 +94,7 @@ var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The tal
 const TEXTSPEED = (1.0/60.0) * 5.0
 const TEXTSPEEDFAST = (1.0/60.0)
 
-func _init():
+func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, setImmediateExit: bool = false):
 	# Define the built-in characters
 	# If you wish to add more characters, set them up here!
 	# Otherwise, you might have to define them every time you want to use them
@@ -102,26 +108,23 @@ func _init():
 	defineSpeaker("Cream", "res://characters/cream/sprites/CreamDialoguePortraits.png", ["Standard", "Sad", "Excited"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
 	defineSpeaker("Chaos Gamma", "res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png", ["Standard", "Identifying", "Standard (Guard Robo)"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
 	defineSpeaker("Chaos", "res://characters/chaos/sprites/ChaosDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
-	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened", "Intrigued (Phi)"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
+	defineSpeaker("Phi", "res://characters/emerl/sprites/PhiDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	# NOTICE: Feel free to add your own speakers under this if you want to!
 	
 	# test, delete once over with
-	addSpeaker(["Amy", 0, "Left", "Left", "Right"], ["Emerl", 0, "Right", "Right", "Left"])
-	changeSpeaker("Amy", "Concerned", "Right")
-	# TODO: fix changeSpeaker poses grabbing based on current index instead of master index
-	addDialogue("That's not... the... ThornRing,\nis it...?", "Amy")
-	addOption()
-	addDialogue("It snew", "Emerl")
-	changeSpeaker("Amy", 2, "Right")
-	addDialogue("what", "Amy")
-	addDialogue("what do you [color=red]mean", "Amy")
-	addDialogue("I'm listening.")
+	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
+	addSpeaker(["Sonic", 0, "Left", "Left", "Right"])
+	addSpeakerEffect("Sonic", 0)
+	addDialogue("Testing, testing!", "Sonic")
+	
+	# Set our parameters for instantiation.
+	backgroundShade = setBackgroundShade
+	immediateEnter = setImmediateEnter
+	immediateExit = setImmediateExit
 
 func _ready():
-	if backgroundShade == true:
-		animationShade.play("Initial")
-	
 	# Set the initial box style.
 	for dialogueValue in dialogueList.size():
 		if dialogueList[dialogueValue][0] == "Dialogue":
@@ -130,6 +133,16 @@ func _ready():
 			else:
 				dialogueBox.texture.region.position.y = 48 * nextTextbox
 			break
+	
+	# If we have an immediate entrance, set our animations directly to "Idle."
+	if immediateEnter == true:
+		animationTextbox.play("Idle")
+		if backgroundShade == true:
+			animationShade.play("Idle")
+	elif backgroundShade == true:
+		animationShade.play("Initial")
+	
+	
 
 func _physics_process(delta):
 	# Keep refreshing until the first bit of dialogue appears.
@@ -364,6 +377,15 @@ func setUpDialogue():
 			toggleFadeDefinition(dialogueList[0][1], dialogueList[0][2])
 		elif dialogueList[0][0] == "addOption":
 			addOptionDefinition()
+		elif dialogueList[0][0] == "addDelay":
+			# Remove our textbox if we have to.
+			if dialogueList[0][2] == true:
+				textLabel.text = ""
+			addDelayDefinition(dialogueList[0][1])
+		elif dialogueList[0][0] == "addSound":
+			addSoundDefinition(dialogueList[0][1])
+		elif dialogueList[0][0] == "addSpeakerEffect":
+			addSpeakerEffectDefinition(dialogueList[0][1], dialogueList[0][2])
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -1335,6 +1357,27 @@ func changeChoosing():
 		choosing = true
 	else:
 		choosing = false
+
+func addDelay(time: float, removeTextbox: bool = false):
+	dialogueList.append(["addDelay", time, removeTextbox])
+
+## Adds delay.
+func addDelayDefinition(time: float):
+	animationPlaying = true
+	
+	var tween = create_tween()
+	tween.tween_interval(time)
+	tween.tween_callback(changeAnimationPlaying)
+	tween.tween_callback(setUpDialogue)
+
+func addSound(sound: String):
+	dialogueList.append(["addSound", sound])
+
+## Adds a sound.
+func addSoundDefinition(sound: String):
+	soundBankExtra.stream = load(sound)
+	soundBankExtra.play()
+	setUpDialogue()
 		
 func toggleFade(fadeColor = "Black", fadeType = 0):
 	# Convert our fade colors to values.
@@ -1380,6 +1423,65 @@ func toggleFadeDefinition(fadeColor: int, fadeType: int):
 	
 	tween.tween_callback(changeAnimationPlaying)
 	tween.tween_callback(setUpDialogue)
+	
+func addSpeakerEffect(setName: String, effect):
+	# Convert our effect String to values.
+	if effect is String:
+		if effect.to_upper() == "ALERT" or effect.to_upper() == "EXCLAMATION":
+			effect = 0
+		elif effect.to_upper() == "QUESTION" or effect.to_upper() == "CONFUSED":
+			effect = 1
+		elif effect.to_upper() == "EMERALD" or effect.to_upper() == "CHAOS_EMERALD":
+			effect = 2
+		elif effect.to_upper() == "SHARD" or effect.to_upper() == "EMERALD_SHARD":
+			effect = 3
+		elif effect.to_upper() == "LOVE":
+			effect = 4
+		elif effect.to_upper() == "SHAKE" or effect.to_upper() == "DAMAGE" or effect.to_upper() == "DESTROY":
+			effect = 5
+	
+	# Append this to our dialogue list.
+	dialogueList.append(["addSpeakerEffect", setName, effect])
+
+func addSpeakerEffectDefinition(setName: String, effect: int):
+	animationPlaying = true
+	
+	# First, check if our speaker exists in our current scene.
+	var speakerIndex
+	for speakerValue in speakerList.size():
+		if speakerList[speakerValue][0] == setName:
+			speakerIndex = speakerValue
+			break
+	if speakerIndex == null:
+		print("There's no character with name " + setName + "!")
+		return
+	
+	# Set which speaker we're referencing or modifying.
+	var speaker
+	match speakerIndex:
+		0:
+			speaker = speaker1
+		1:
+			speaker = speaker2
+		_:
+			speaker = speaker3
+	
+	# Now, play our animations!
+	if effect == 0 or effect == 1:
+		spriteSpeakerEffect.global_position.x = speaker.global_position.x + 48
+		spriteSpeakerEffect.visible = true
+		
+		match effect:
+			0:
+				animationSpeakerEffect.play("Alert")
+			1:
+				animationSpeakerEffect.play("Confusion")
+		
+		await animationSpeakerEffect.animation_finished
+		spriteSpeakerEffect.visible = false	
+	
+	animationPlaying = false
+	setUpDialogue()
 	
 
 # Animations for the textbox.
