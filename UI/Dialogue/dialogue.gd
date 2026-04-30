@@ -1488,10 +1488,25 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		animationSpeakerEffect.play("Love")
 		# TODO: this animation goes on for 3 seconds.
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 51, speaker.global_position.y + 78)
-		# TODO: maybe double-check alert position too
 		spriteSpeakerEffect.visible = true
 		tween.tween_property(spriteSpeakerEffect, "global_position:y", -16, 3)
+		# Would've done this related to time, but we can't really do that here.
+		# Maybe this could be optimized lol
+		
+		# We have to create another tween specifically for our X position.
+		var tweenX = create_tween()
+		tweenX.set_trans(Tween.TRANS_SINE)
+		tweenX.set_ease(Tween.EASE_OUT)
+		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", spriteSpeakerEffect.global_position.x - 10, ((3.0/4)/2))
+		tweenX.set_ease(Tween.EASE_IN_OUT)
+		# really hacky here since it only detects the initial global position
+		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x - 10) + 20, (3.0/4))
+		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x + 10) - 20, (3.0/4))
+		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x - 10) + 20, (3.0/4))
+		tweenX.set_ease(Tween.EASE_IN)
+		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x + 10) - 10, ((3.0/4)/2))
 		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
+		
 	
 	tween.tween_callback(changeAnimationPlaying)
 	tween.tween_callback(setUpDialogue)
