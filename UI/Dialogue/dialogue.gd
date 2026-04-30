@@ -115,9 +115,9 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	
 	# test, delete once over with
 	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
-	addSpeaker(["Sonic", 0, "Left", "Left", "Right"])
-	addSpeakerEffect("Sonic", 0)
-	addDialogue("Testing, testing!", "Sonic")
+	addSpeaker(["Amy", "Happy", "Left", "Left", "Right"])
+	addSpeakerEffect("Amy", "Love")
+	addDialogue("Testing, testing!", "Amy")
 	
 	# Set our parameters for instantiation.
 	backgroundShade = setBackgroundShade
@@ -1431,11 +1431,11 @@ func addSpeakerEffect(setName: String, effect):
 			effect = 0
 		elif effect.to_upper() == "QUESTION" or effect.to_upper() == "CONFUSED":
 			effect = 1
-		elif effect.to_upper() == "EMERALD" or effect.to_upper() == "CHAOS_EMERALD":
-			effect = 2
-		elif effect.to_upper() == "SHARD" or effect.to_upper() == "EMERALD_SHARD":
-			effect = 3
 		elif effect.to_upper() == "LOVE":
+			effect = 2
+		elif effect.to_upper() == "EMERALD" or effect.to_upper() == "CHAOS_EMERALD":
+			effect = 3
+		elif effect.to_upper() == "SHARD" or effect.to_upper() == "EMERALD_SHARD":
 			effect = 4
 		elif effect.to_upper() == "SHAKE" or effect.to_upper() == "DAMAGE" or effect.to_upper() == "DESTROY":
 			effect = 5
@@ -1466,10 +1466,12 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		_:
 			speaker = speaker3
 	
+	# Set up our tweens in case we're doing any tween animations.
+	var tween = create_tween()
+	
 	# Now, play our animations!
 	if effect == 0 or effect == 1:
-		spriteSpeakerEffect.global_position.x = speaker.global_position.x + 48
-		spriteSpeakerEffect.visible = true
+		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, 57)
 		
 		match effect:
 			0:
@@ -1477,11 +1479,22 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 			1:
 				animationSpeakerEffect.play("Confusion")
 		
+		spriteSpeakerEffect.visible = true
+		
 		await animationSpeakerEffect.animation_finished
-		spriteSpeakerEffect.visible = false	
+		spriteSpeakerEffect.visible = false
+	elif effect == 2:
+		# TODO: play appropriate sound (see end of Amy's story)
+		animationSpeakerEffect.play("Love")
+		# TODO: this animation goes on for 3 seconds.
+		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 51, speaker.global_position.y + 78)
+		# TODO: maybe double-check alert position too
+		spriteSpeakerEffect.visible = true
+		tween.tween_property(spriteSpeakerEffect, "global_position:y", -16, 3)
+		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
 	
-	animationPlaying = false
-	setUpDialogue()
+	tween.tween_callback(changeAnimationPlaying)
+	tween.tween_callback(setUpDialogue)
 	
 
 # Animations for the textbox.

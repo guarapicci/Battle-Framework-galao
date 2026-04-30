@@ -143,6 +143,18 @@ tracks/4/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:hframes")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [12]
+}
 
 [sub_resource type="Animation" id="Animation_g5apj"]
 resource_name = "Confusion"
@@ -208,6 +220,60 @@ tracks/4/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:hframes")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [12]
+}
+
+[sub_resource type="Animation" id="Animation_imq31"]
+resource_name = "Love"
+length = 0.7000017
+loop_mode = 1
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:vframes")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [10]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [12]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.116666675, 0.23333335, 0.35000002, 0.4666667, 0.5833334),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [96, 97, 98, 99, 98, 97]
+}
 
 [sub_resource type="Animation" id="Animation_iosqy"]
 length = 0.001
@@ -271,11 +337,24 @@ tracks/4/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:hframes")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [12]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_iosqy"]
 _data = {
 &"Alert": SubResource("Animation_j0g67"),
 &"Confusion": SubResource("Animation_g5apj"),
+&"Love": SubResource("Animation_imq31"),
 &"RESET": SubResource("Animation_iosqy")
 }
 
@@ -620,17 +699,9 @@ texture = SubResource("AtlasTexture_bc1hc")
 [node name="CanvasLayerCharacters" type="CanvasLayer" parent="." unique_id=1920777913]
 
 [node name="Speaker1" type="TextureRect" parent="CanvasLayerCharacters" unique_id=777422764]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -216.0
-offset_top = -141.0
-offset_right = -120.0
-offset_bottom = -45.0
-grow_horizontal = 2
-grow_vertical = 0
+offset_left = -96.0
+offset_top = 19.0
+offset_bottom = 115.0
 pivot_offset = Vector2(48, 0)
 texture = SubResource("AtlasTexture_pgf0d")
 expand_mode = 1
@@ -744,7 +815,7 @@ grow_vertical = 2
 texture = SubResource("AtlasTexture_wf0ws")
 
 [node name="SpeakerEffects" type="Sprite2D" parent="CanvasLayerForeground" unique_id=1185610792]
-position = Vector2(-48, 57)
+position = Vector2(-20, 57)
 texture = ExtResource("5_bc1hc")
 hframes = 12
 vframes = 11
