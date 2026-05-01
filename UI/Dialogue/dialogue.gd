@@ -86,10 +86,6 @@ var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The tal
 @onready var continueIndicator = $CanvasLayer/ContinueIndicator
 @onready var continueAnimation = $CanvasLayer/ContinueIndicator/AnimationPlayer
 
-# TODO: fix colors and support colors.
-# The text appears white by default for some reason...
-# Also test if changing the colors midway through works as intended.
-
 # Default is 5 frames.
 const TEXTSPEED = (1.0/60.0) * 5.0
 const TEXTSPEEDFAST = (1.0/60.0)
@@ -106,7 +102,8 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	defineSpeaker("Rouge", "res://characters/rouge/sprites/RougeDialoguePortraits.png", ["Standard", "Disgusted"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
 	defineSpeaker("Amy", "res://characters/amy/sprites/AmyDialoguePortraits.png", ["Standard", "Angry", "Happy", "Concerned"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
 	defineSpeaker("Cream", "res://characters/cream/sprites/CreamDialoguePortraits.png", ["Standard", "Sad", "Excited"], "res://assets/audio/sfx/Dialogue/DialogueHighPitch.wav")
-	defineSpeaker("Chaos Gamma", "res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png", ["Standard", "Identifying", "Standard (Guard Robo)"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Chaos Gamma", "res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png", ["Standard", "Identifying"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
+	defineSpeaker("Guard Robo", "res://characters/chaos_gamma/sprites/GuardRoboDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
 	defineSpeaker("Chaos", "res://characters/chaos/sprites/ChaosDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueLowPitch.wav")
 	defineSpeaker("Emerl", "res://characters/emerl/sprites/EmerlDialoguePortraits.png", ["Standard", "Intrigued", "Powering Up", "Awakened"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	defineSpeaker("Phi", "res://characters/emerl/sprites/PhiDialoguePortraits.png", ["Standard"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
@@ -115,9 +112,9 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	
 	# test, delete once over with
 	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
-	addSpeaker(["Amy", "Happy", "Left", "Left", "Right"])
-	addSpeakerEffect("Amy", "Love")
-	addDialogue("Testing, testing!", "Amy")
+	addSpeaker(["Emerl", "Standard", "Left", "Left", "Left"])
+	addSpeakerEffect("Emerl", "Shard")
+	addDialogue("Testing, testing!", "Emerl")
 	
 	# Set our parameters for instantiation.
 	backgroundShade = setBackgroundShade
@@ -1486,10 +1483,9 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 	elif effect == 2:
 		# TODO: play appropriate sound (see end of Amy's story)
 		animationSpeakerEffect.play("Love")
-		# TODO: this animation goes on for 3 seconds.
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 51, speaker.global_position.y + 78)
 		spriteSpeakerEffect.visible = true
-		tween.tween_property(spriteSpeakerEffect, "global_position:y", -16, 3)
+		tween.tween_property(spriteSpeakerEffect, "global_position:y", -12, 3)
 		# Would've done this related to time, but we can't really do that here.
 		# Maybe this could be optimized lol
 		
@@ -1505,8 +1501,23 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x - 10) + 20, (3.0/4))
 		tweenX.set_ease(Tween.EASE_IN)
 		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x + 10) - 10, ((3.0/4)/2))
-		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
 		
+		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
+	elif effect == 3 or effect == 4:
+		# TODO: Emerald effects
+		# TODO: initial go-down goes to 225 frames or 3.75 secs
+		match effect:
+			3:
+				animationSpeakerEffect.play("Emerald")
+			4:
+				animationSpeakerEffect.play("Emerald Shard")
+		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, -16)
+		tween.tween_property(spriteSpeakerEffect, "global_position:y", speaker.global_position.y + 64, 3.75)
+		spriteSpeakerEffect.visible = true
+		tween.tween_interval(1)
+		tween.tween_property(spriteSpeakerEffect, "scale", Vector2(0, 0), 0.25)
+		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
+		tween.tween_property(spriteSpeakerEffect, "scale", Vector2(1, 1), 0)
 	
 	tween.tween_callback(changeAnimationPlaying)
 	tween.tween_callback(setUpDialogue)
