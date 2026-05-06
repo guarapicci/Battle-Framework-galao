@@ -1457,6 +1457,9 @@ func addSpeakerEffect(setName: String, effect):
 			effect = 6
 		elif effect.to_upper() == "SHAKE" or effect.to_upper() == "DAMAGE":
 			effect = 7
+		else:
+			print("Invalid effect! Reverting to the default ALERT.")
+			effect = 0
 	
 	# Append this to our dialogue list.
 	dialogueList.append(["addSpeakerEffect", setName, effect])
