@@ -285,14 +285,50 @@ func setUpDialogue():
 	# Remove speed-up mode and the pointer.
 	goingFast = false
 	dialoguePointer.position.x = -32
-	# If that's all the dialogue, remove the textbox.
+	# If that's all the dialogue, remove the textbox if we don't have any speakers.
 	if not dialogueList:
-		# TODO: add option for either just deleting it or
-		# doing the regular dialogue exit
-		animationTextbox.play("Exiting")
-		# Taking away the background shade
-		if backgroundShade:
-			animationShade.play("Exiting")
+		print(speakerList)
+		
+		# Get the names of all of our Speakers that we're removing beforehand.
+		if speakerList != [null, null, null]:
+			var speakerToRemove1 = null
+			if speakerList[0] != null:
+				speakerToRemove1 = speakerList[0][0]
+				
+			var speakerToRemove2 = null
+			if speakerList[1] != null:
+				if speakerToRemove1 == null:
+					speakerToRemove1 = speakerList[1][0]
+				else:
+					speakerToRemove2 = speakerList[1][0]
+			
+			var speakerToRemove3 = null
+			if speakerList[2] != null:
+				if speakerToRemove1 == null:
+					speakerToRemove1 = speakerList[2][0]
+				elif speakerToRemove2 == null:
+					speakerToRemove2 = speakerList[2][0]
+				else:
+					speakerToRemove3 = speakerList[2][0]
+			
+			# TODO: Check if we have an immediate exit, and replace "Fade" appropriately.
+			var exitType = null
+			if immediateExit == false:
+				exitType = "Fade"
+			
+			# Remove the speakers.
+			if speakerToRemove2 == null:
+				removeSpeakerDefinition([speakerToRemove1, exitType])
+			elif speakerToRemove3 == null:
+				removeSpeakerDefinition([speakerToRemove1, exitType], [speakerToRemove2, exitType])
+			else:
+				removeSpeakerDefinition([speakerToRemove1, exitType], [speakerToRemove2, exitType], [speakerToRemove3, exitType])
+		
+		else:
+			animationTextbox.play("Exiting")
+			# Taking away the background shade
+			if backgroundShade:
+				animationShade.play("Exiting")
 	else:
 		# Let's check if we have dialogue or a speaker change/addition/removal.
 		if dialogueList[0][0] == "Dialogue":
@@ -400,6 +436,8 @@ func setUpDialogue():
 			addSoundDefinition(dialogueList[0][1])
 		elif dialogueList[0][0] == "addSpeakerEffect":
 			addSpeakerEffectDefinition(dialogueList[0][1], dialogueList[0][2])
+		elif dialogueList[0][0] == "addCallable":
+			addCallableDefinition(dialogueList[0][1])
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -1584,6 +1622,13 @@ func changeSpeakerShaking():
 		speaker3Shaking = false
 		speaker3.global_position = speakerReferencePosition
 	speakerReferencePosition = null
+
+func addCallable(callable: Callable):
+	dialogueList.append(["addCallable", callable])
+
+func addCallableDefinition(callable: Callable):
+	callable.call()
+	setUpDialogue()
 
 # Animations for the textbox.
 func _on_animation_player_animation_finished(anim_name):

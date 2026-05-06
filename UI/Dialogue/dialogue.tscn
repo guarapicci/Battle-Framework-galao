@@ -1011,7 +1011,6 @@ autoplay = &"Initial"
 
 [node name="ButtonYes" type="Sprite2D" parent="CanvasLayerForeground" unique_id=140835026]
 position = Vector2(240, 64)
-scale = Vector2(1e-05, 1e-05)
 texture = ExtResource("6_pgf0d")
 offset = Vector2(16, 12)
 hframes = 3
