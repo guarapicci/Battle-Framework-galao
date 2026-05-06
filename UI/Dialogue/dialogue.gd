@@ -116,6 +116,7 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	# NOTICE: Feel free to add your own speakers under this if you want to!
 	
 	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
+	# ...I'm letting you figure that one out with addCallable, LOL
 	
 	# Set our parameters for instantiation.
 	backgroundShade = setBackgroundShade
@@ -1545,13 +1546,15 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		animationPlaying = false
 		setUpDialogue()
 	elif effect == 2:
-		# TODO: play appropriate sound (see end of Amy's story)
 		animationSpeakerEffect.play("Love")
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 51, speaker.global_position.y + 78)
 		spriteSpeakerEffect.visible = true
 		tween.tween_property(spriteSpeakerEffect, "global_position:y", -12, 3)
 		# Would've done this related to time, but we can't really do that here.
 		# Maybe this could be optimized lol
+		
+		soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialogueLove.wav")
+		soundBankExtra.play()
 		
 		# We have to create another tween specifically for our X position.
 		var tweenX = create_tween()
@@ -1575,6 +1578,8 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 				animationSpeakerEffect.play("Emerald")
 			4:
 				animationSpeakerEffect.play("Emerald Shard")
+		soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialogueEmerald.wav")
+		soundBankExtra.play()
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, -16)
 		tween.tween_property(spriteSpeakerEffect, "global_position:y", speaker.global_position.y + 64, 3.75)
 		spriteSpeakerEffect.visible = true
@@ -1591,7 +1596,6 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 			6:
 				animationSpeakerEffect.play("Heavy Hit")
 		
-		# TODO: play sound effects
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, 95)
 		spriteSpeakerEffect.visible = true
 		

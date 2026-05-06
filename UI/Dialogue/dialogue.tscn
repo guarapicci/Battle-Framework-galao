@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cqgre1b5lipgv" path="res://UI/Dialogue/DialogueMisc.png" id="5_bc1hc"]
 [ext_resource type="AudioStream" uid="uid://dluorjx5v5hgl" path="res://assets/audio/sfx/Dialogue/DialogueAlert.wav" id="6_aaxua"]
 [ext_resource type="Texture2D" uid="uid://cjk0n6n147cya" path="res://UI/Dialogue/DialogueYesNo.png" id="6_pgf0d"]
+[ext_resource type="AudioStream" uid="uid://cyuub7feekl1c" path="res://assets/audio/sfx/Dialogue/DialogueHit.wav" id="7_aaxua"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wf0ws"]
 atlas = ExtResource("2_hix8u")
@@ -357,6 +358,30 @@ tracks/2/keys = {
 "update": 1,
 "values": [120, 121, 122, 123, 124, 125, 126, 127]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("../../AudioStreamExtra:stream")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("7_aaxua")]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("../../AudioStreamExtra:playing")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_v7yg0"]
 resource_name = "Light Hit"
@@ -397,6 +422,30 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [108, 109, 110, 111, 112, 113]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("../../AudioStreamExtra:stream")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("7_aaxua")]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("../../AudioStreamExtra:playing")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_imq31"]
