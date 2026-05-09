@@ -141,7 +141,12 @@ func _ready():
 	elif backgroundShade == true:
 		animationShade.play("Initial")
 	
-	
+	addSpeaker(["Sonic", "Standard", "Middle", "Fade", "Right"])
+	addDialogue("Hey!  I'm Sonic, Sonic the hedgehog!", "Sonic")
+	addSpeaker(["Tails", "Worried", "Right", "Right", "Left"])
+	addDialogue("Sonic, I think everyone knows\nwho you are already.", "Tails")
+	addSpeaker(["Knuckles", "Standard", "Right", "Right", "Left"])
+	addDialogue("Hey guys what I miss?", "Knuckles")
 
 func _physics_process(delta):
 	# Keep refreshing until the first bit of dialogue appears.
@@ -267,8 +272,9 @@ func _physics_process(delta):
 			tween.tween_callback(setUpDialogue)
 		else:
 			# Speed up the text.
-			if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
-				goingFast = true
+			if dialogueList != []:
+				if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
+					goingFast = true
 
 ## Emits a signal for the option picked.
 func emitChoosingSignal():
@@ -288,8 +294,6 @@ func setUpDialogue():
 	dialoguePointer.position.x = -32
 	# If that's all the dialogue, remove the textbox if we don't have any speakers.
 	if not dialogueList:
-		print(speakerList)
-		
 		# Get the names of all of our Speakers that we're removing beforehand.
 		if speakerList != [null, null, null]:
 			var speakerToRemove1 = null
