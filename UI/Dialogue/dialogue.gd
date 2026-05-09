@@ -140,13 +140,7 @@ func _ready():
 			animationShade.play("Idle")
 	elif backgroundShade == true:
 		animationShade.play("Initial")
-	
-	addSpeaker(["Sonic", "Standard", "Middle", "Fade", "Right"])
-	addDialogue("Hey!  I'm Sonic, Sonic the hedgehog!", "Sonic")
-	addSpeaker(["Tails", "Worried", "Right", "Right", "Left"])
-	addDialogue("Sonic, I think everyone knows\nwho you are already.", "Tails")
-	addSpeaker(["Knuckles", "Standard", "Right", "Right", "Left"])
-	addDialogue("Hey guys what I miss?", "Knuckles")
+
 
 func _physics_process(delta):
 	# Keep refreshing until the first bit of dialogue appears.
