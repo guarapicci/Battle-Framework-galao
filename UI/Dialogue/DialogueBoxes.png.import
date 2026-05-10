@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://qdqelnmrvdcg"
+path="res://.godot/imported/DialogueBoxes.png-71b402929127e33ee77fb4383aa6fe60.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://UI/Dialogue/DialogueBoxes.png"
+dest_files=["res://.godot/imported/DialogueBoxes.png-71b402929127e33ee77fb4383aa6fe60.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://dj5e757u3rps0"
+path="res://.godot/imported/ChaosGammaDialoguePortraits.png-004835bb6dee9ac6d90b19fd93d50b30.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://characters/chaos_gamma/sprites/ChaosGammaDialoguePortraits.png"
+dest_files=["res://.godot/imported/ChaosGammaDialoguePortraits.png-004835bb6dee9ac6d90b19fd93d50b30.ctex"]
 
 [params]
 

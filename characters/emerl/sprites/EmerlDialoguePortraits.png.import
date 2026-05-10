@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://c63uqejiwgxy8"
+path="res://.godot/imported/EmerlDialoguePortraits.png-b1610dd524ba3a518e1b9305776da766.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://characters/emerl/sprites/EmerlDialoguePortraits.png"
+dest_files=["res://.godot/imported/EmerlDialoguePortraits.png-b1610dd524ba3a518e1b9305776da766.ctex"]
 
 [params]
 

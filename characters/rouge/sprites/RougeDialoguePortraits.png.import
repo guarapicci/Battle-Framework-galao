@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1m47apvyaur2"
-path="res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"
+uid="uid://dhcf4rba86bqp"
+path="res://.godot/imported/RougeDialoguePortraits.png-2ddff83cf41e0398cd1dfdcf7ed8bf4a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://menus/TitleScreen/titlescreen banner treated.webp"
-dest_files=["res://.godot/imported/titlescreen banner treated.webp-bb8cd67a8764546bc4410ae47f62a633.ctex"]
+source_file="res://characters/rouge/sprites/RougeDialoguePortraits.png"
+dest_files=["res://.godot/imported/RougeDialoguePortraits.png-2ddff83cf41e0398cd1dfdcf7ed8bf4a.ctex"]
 
 [params]
 
