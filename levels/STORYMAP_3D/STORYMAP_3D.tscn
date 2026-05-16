@@ -140,9 +140,33 @@ collision_mask = 1048576
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27789313, 0)
 shape = SubResource("CylinderShape3D_e5y14")
 
+[node name="platform_stage2" parent="." unique_id=868162294 instance=ExtResource("7_e5y14")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.653439, 0.68171924, -6.688655)
+
+[node name="Label3D" type="Label3D" parent="platform_stage2" unique_id=488372320]
+transform = Transform3D(-5.54, 0, -4.843222e-07, 0, 5.54, 0, 4.843222e-07, 0, -5.54, 0, 1.7716062, 0)
+text = "(2)"
+font = ExtResource("8_ufb4k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="platform_stage2/Label3D" unique_id=2121543056]
+libraries/ = SubResource("AnimationLibrary_eto2f")
+autoplay = &"speen"
+
+[node name="Stage2 trigger" type="Area3D" parent="platform_stage2" unique_id=1326155439]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 1048576
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="platform_stage2/Stage2 trigger" unique_id=1199477966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27789313, 0)
+shape = SubResource("CylinderShape3D_e5y14")
+
 [connection signal="body_entered" from="platform_stage1/Stage1 trigger" to="." method="_trigger_callback_stage1"]
+[connection signal="body_entered" from="platform_stage2/Stage2 trigger" to="." method="_trigger_callback_stage2"]
 
 [editable path="Stage world/CameraRoot"]
 [editable path="moyaiplane"]
 [editable path="platform_stage1"]
 [editable path="platform_stage1/platform"]
+[editable path="platform_stage2"]
+[editable path="platform_stage2/platform"]

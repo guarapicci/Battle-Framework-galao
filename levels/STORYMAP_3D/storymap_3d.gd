@@ -1,11 +1,21 @@
 extends Node3D
 
+
+## This script controls the story mode hub world.
+## Dialogue sequences pause player input. 
+## Stage entry platforms trigger story mode stages.
+
 @onready var global_counter = 0.0
 
 @onready var player1: BattleCharacter = %"main player"
 @onready var camera: Node3D = $"Stage world/CameraRoot"
-@onready var link_stage1: Node3D = $platform_stage1
+
+# this probably won't be needed.
+#@onready var link_stage1: Node3D = $platform_stage1
+
 @onready var trigger_stage1: Area3D = %"Stage1 trigger"
+@onready var trigger_stage2: Area3D = %"Stage2 trigger"
+@onready var main_player: Node3D = %"main player"
 
 @onready var dialogue_blueprint: PackedScene = preload("res://UI/Dialogue/dialogue.tscn")
 # Called when the node enters the scene tree for the first time.
@@ -26,7 +36,7 @@ func _ready() -> void:
 	#dialogue.addSpeaker(["Emerl", "Standard", "Left", "Left", "Left"])
 	get_tree().create_timer(0.6).timeout.connect(func():
 		_lock_all_interactive()
-		await _trigger_dialogue_intro()
+		#await _trigger_dialogue_intro()
 		_unlock_all_interactive()
 		pass
 		)
@@ -81,6 +91,25 @@ func _trigger_dialogue_stage_1():
 	SceneChanger.change_scene_to_file("res://match_scene/match_scene.tscn")
 	pass
 
+func _trigger_dialogue_stage_2():
+	var dialogue_scene_root: DialogueSequence = dialogue_blueprint.instantiate()
+	dialogue_scene_root.addSpeaker(["Sonic", "Standard", "Left", "Right", "Left"],
+	["Emerl", "Standard", "Middle", "Right", "Left"],
+	["Tails", "Standard", "Right", "Right", "Left"]
+	)
+	dialogue_scene_root.addDialogue("Looks like the egghead's\nbeen busy!","Sonic")
+	dialogue_scene_root.changeSpeaker("Sonic", "Determined", "Right")
+	dialogue_scene_root.changeSpeaker("Tails", "Determined", "Left")
+	dialogue_scene_root.addDialogue("Badniks incoming!","Tails")
+	add_child(dialogue_scene_root)
+	dialogue_scene_root.process_mode = Node.PROCESS_MODE_ALWAYS
+	_lock_all_interactive()
+	await dialogue_scene_root.dialogue_ended
+	print("dialogue is over. triggering match with stage 2 presets...")
+	SceneChanger.change_scene_to_file("res://levels/STORY_1_2/STORY_1_2.tscn")
+	pass
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	#global_counter += delta
@@ -96,8 +125,17 @@ func _unlock_all_interactive() -> void:
 
 func _trigger_callback_stage1(body: Node3D) -> void:
 	print("detected collision on stage 1 stand")
-	if(body == %"main player"):
+	if(body == main_player):
 		trigger_stage1.monitoring = false
 		_trigger_dialogue_stage_1()
+		pass
+	pass # Replace with function body.
+
+
+func _trigger_callback_stage2(body: Node3D) -> void:
+	print("detected collision on stage 2 stand")
+	if(body == main_player):
+		trigger_stage1.monitoring = false
+		_trigger_dialogue_stage_2()
 		pass
 	pass # Replace with function body.
