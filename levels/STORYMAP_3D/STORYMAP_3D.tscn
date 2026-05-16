@@ -6,11 +6,55 @@
 [ext_resource type="PackedScene" uid="uid://banv3vxi82juf" path="res://levels/STORYMAP_3D/sbnm sm1.glb" id="2_tx5a5"]
 [ext_resource type="PackedScene" uid="uid://cr5pydprtoluo" path="res://levels/city/city.glb" id="2_xqxt3"]
 [ext_resource type="PackedScene" uid="uid://c6epltatnawp7" path="res://levels/tails_gigalab/moyaiplane.glb" id="4_lfs2o"]
+[ext_resource type="PackedScene" uid="uid://vk7odd82sqvb" path="res://levels/STORYMAP_3D/story props/stage platform/stage_platform.tscn" id="7_e5y14"]
+[ext_resource type="FontFile" uid="uid://dl1eghyyse2gl" path="res://menus/fonts/home-video-font/HomeVideo-BLG6G.ttf" id="8_ufb4k"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o0to3"]
 size = Vector3(16, 0.2109375, 19.870605)
 
 [sub_resource type="BoxMesh" id="BoxMesh_xvlff"]
+
+[sub_resource type="Animation" id="Animation_mohte"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 3.1415927, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_tvrx3"]
+resource_name = "speen"
+length = 2.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.4, 2.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 3.1415927, 0), Vector3(0, 6.2831855, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_eto2f"]
+_data = {
+&"RESET": SubResource("Animation_mohte"),
+&"speen": SubResource("Animation_tvrx3")
+}
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_e5y14"]
+height = 1.123169
+radius = 1.2143555
 
 [node name="Node3D5" type="Node3D" unique_id=1988815531]
 script = ExtResource("1_fv27u")
@@ -25,13 +69,13 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -3.9
 
 [node name="CameraRoot" parent="Stage world" unique_id=1988223040 instance=ExtResource("1_nf3r0")]
 
+[node name="Pivot" parent="Stage world/CameraRoot" index="2"]
+transform = Transform3D(-1, -1.4541195e-06, 2.0766988e-06, 0, 0.81915194, 0.57357603, -2.5351817e-06, 0.57357603, -0.81915194, 0, 0, 0)
+
 [node name="Camera" parent="Stage world/CameraRoot/Pivot" index="0"]
 transform = Transform3D(1, -1.2534511e-13, -4.3713094e-13, -1.7480098e-13, 0.7814559, -0.623961, 4.19809e-13, 0.623961, 0.7814559, 1.4159012, -3.7502441, 17.418234)
 projection = 0
 fov = 26.1
-
-[node name="AnimationPlayer" parent="Stage world/CameraRoot/Pivot" index="1"]
-root_node = NodePath("../../../..")
 
 [node name="Node3D" type="Node3D" parent="Stage world" unique_id=1859493501]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2013836, -1.2280936, 0.9125109)
@@ -48,7 +92,7 @@ transform = Transform3D(16.32, 0, 0, 0, 1, 0, 0, 0, 14.2560005, 1, -1.441664, -3
 mesh = SubResource("BoxMesh_xvlff")
 
 [node name="Node3D2" type="Node3D" parent="Stage world" unique_id=877301553]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.660641, 0.90656525, 0.04729843)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.525677, 0.90656525, -12.155317)
 
 [node name="Node3D3" type="Node3D" parent="Stage world" unique_id=1014191456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5705752, 0.93204004, 1.797709)
@@ -56,8 +100,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5705752, 0.93204004, 1.7977
 [node name="Node3D4" type="Node3D" parent="Stage world" unique_id=28872612]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4177697, 0.9365427, -1.6846395)
 
-[node name="Sonic" parent="Stage world" unique_id=196693236 instance=ExtResource("1_s5mt2")]
-transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 1, 0)
+[node name="main player" parent="Stage world" unique_id=196693236 groups=["hub world interactive"] instance=ExtResource("1_s5mt2")]
+unique_name_in_owner = true
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -13.142562, 1, -11.952229)
 
 [node name="moyaiplane" parent="." unique_id=1397143913 instance=ExtResource("4_lfs2o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.077242, 2.0551476, 7.1405635)
@@ -74,5 +119,30 @@ light_color = Color(0.81, 0.61749, 0.3078, 1)
 light_energy = 0.22
 shadow_enabled = true
 
+[node name="platform_stage1" parent="." unique_id=75447616 instance=ExtResource("7_e5y14")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.7999, 0.68171924, -12.290767)
+
+[node name="Label3D" type="Label3D" parent="platform_stage1" unique_id=81240336]
+transform = Transform3D(-5.54, 0, -4.843222e-07, 0, 5.54, 0, 4.843222e-07, 0, -5.54, 0, 1.7716062, 0)
+text = "(1)"
+font = ExtResource("8_ufb4k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="platform_stage1/Label3D" unique_id=585125449]
+libraries/ = SubResource("AnimationLibrary_eto2f")
+autoplay = &"speen"
+
+[node name="Stage1 trigger" type="Area3D" parent="platform_stage1" unique_id=466332515]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 1048576
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="platform_stage1/Stage1 trigger" unique_id=1026921900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27789313, 0)
+shape = SubResource("CylinderShape3D_e5y14")
+
+[connection signal="body_entered" from="platform_stage1/Stage1 trigger" to="." method="_trigger_callback_stage1"]
+
 [editable path="Stage world/CameraRoot"]
 [editable path="moyaiplane"]
+[editable path="platform_stage1"]
+[editable path="platform_stage1/platform"]
