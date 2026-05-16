@@ -60,6 +60,7 @@ func _trigger_dialogue_intro():
 	dialogue_scene_root.process_mode = Node.PROCESS_MODE_ALWAYS
 	await dialogue_scene_root.dialogue_ended
 	print("dialogue is over. carrying on with hub world...")
+	get_tree().paused = false
 	pass
 
 func _trigger_dialogue_stage_1():
