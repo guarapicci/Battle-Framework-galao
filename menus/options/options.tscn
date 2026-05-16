@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://d2b01dpex47am"]
+
+[ext_resource type="PackedScene" uid="uid://dmqtdie76rgi8" path="res://menus/background.tscn" id="1_g8vb3"]
+
+[node name="Options" type="Control" unique_id=1531113338]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" parent="." unique_id=1993543924 instance=ExtResource("1_g8vb3")]
+
+[node name="Container" type="Container" parent="Background" unique_id=1971342837]
+offset_left = 16.0
+offset_right = 225.0
+offset_bottom = 160.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/Container" unique_id=349836819]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Background/Container/HBoxContainer" unique_id=442562743]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Touchscreen Gamepad"
+
+[node name="CheckButton" type="CheckButton" parent="Background/Container/HBoxContainer" unique_id=3308162]
+layout_mode = 2
