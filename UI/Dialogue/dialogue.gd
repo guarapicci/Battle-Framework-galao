@@ -1,10 +1,15 @@
 class_name DialogueSequence extends Control
+
 ## A dialogue system set up like that of Sonic Battle (GBA).
 ## When instantiating this node, there are certain variables you can set before
 ## you make the dialogue appear as a child.
 ##
 ## To use this, simply drag and drop this Scene from the file system
 ## into the map you want to use the dialogue in.
+
+## To use this, please refer to this helpful documentation below:
+## https://docs.google.com/document/d/1e6PvMSDok5-YuAbXsFArWQJNcP8_r0e_bSD1uH1ZSZI/edit?usp=sharing
+
 ##
 ## Created by ShinySkink9185, being borrowed from Klonoa Project Test.
 ## I hope Mobi doesn't mind me shilling it...!
@@ -75,6 +80,12 @@ var speaker1Entering = false
 var speaker2Entering = false
 var speaker3Entering = false
 
+
+var speaker1Shaking = false
+var speaker2Shaking = false
+var speaker3Shaking = false
+var speakerReferencePosition = null
+
 var talkSound = "res://assets/audio/sfx/Dialogue/DialogueRegular.wav" ## The talk sound that's currently being used.
 
 # Storage for textures.
@@ -110,11 +121,10 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	# NOTICE: Feel free to add your own speakers under this if you want to!
 	
-	# test, delete once over with
+
 	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
-	#addSpeaker(["Emerl", "Standard", "Left", "Left", "Left"])
-	#addSpeakerEffect("Emerl", "Shard")
-	#addDialogue("Testing, testing!", "Emerl")
+	# ...I'm letting you figure that one out with addCallable, LOL
+
 	
 	# Set our parameters for instantiation.
 	backgroundShade = setBackgroundShade
@@ -138,8 +148,7 @@ func _ready():
 			animationShade.play("Idle")
 	elif backgroundShade == true:
 		animationShade.play("Initial")
-	
-	
+
 
 func _physics_process(delta):
 	# Keep refreshing until the first bit of dialogue appears.
@@ -148,6 +157,23 @@ func _physics_process(delta):
 			setUpDialogue()
 			justStarted = false
 		return
+	
+
+	# Shake the speaker.
+	var speakerShaking = null
+	
+	if speaker1Shaking == true:
+		speakerShaking = speaker1
+	elif speaker2Shaking == true:
+		speakerShaking = speaker2
+	elif speaker3Shaking == true:
+		speakerShaking = speaker3
+	
+	if speakerShaking != null:
+		if speakerReferencePosition == null:
+			speakerReferencePosition = speakerShaking.global_position
+		# TODO: figure out how far the X and the Y can go before shaking
+		speakerShaking.global_position = Vector2(speakerReferencePosition.x + randi_range(-8, 8), speakerReferencePosition.y + randi_range(0, 8))
 	
 	if currentDialogue.length() > 0:
 		if delayTimer <= 0:
@@ -249,8 +275,10 @@ func _physics_process(delta):
 			tween.tween_callback(setUpDialogue)
 		else:
 			# Speed up the text.
-			if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
-				goingFast = true
+
+			if dialogueList != []:
+				if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
+					goingFast = true
 
 ## Emits a signal for the option picked.
 func emitChoosingSignal():
@@ -268,14 +296,49 @@ func setUpDialogue():
 	# Remove speed-up mode and the pointer.
 	goingFast = false
 	dialoguePointer.position.x = -32
-	# If that's all the dialogue, remove the textbox.
+
+	# If that's all the dialogue, remove the textbox if we don't have any speakers.
 	if not dialogueList:
-		# TODO: add option for either just deleting it or
-		# doing the regular dialogue exit
-		animationTextbox.play("Exiting")
-		# Taking away the background shade
-		if backgroundShade:
-			animationShade.play("Exiting")
+		# Get the names of all of our Speakers that we're removing beforehand.
+		if speakerList != [null, null, null]:
+			var speakerToRemove1 = null
+			if speakerList[0] != null:
+				speakerToRemove1 = speakerList[0][0]
+				
+			var speakerToRemove2 = null
+			if speakerList[1] != null:
+				if speakerToRemove1 == null:
+					speakerToRemove1 = speakerList[1][0]
+				else:
+					speakerToRemove2 = speakerList[1][0]
+			
+			var speakerToRemove3 = null
+			if speakerList[2] != null:
+				if speakerToRemove1 == null:
+					speakerToRemove1 = speakerList[2][0]
+				elif speakerToRemove2 == null:
+					speakerToRemove2 = speakerList[2][0]
+				else:
+					speakerToRemove3 = speakerList[2][0]
+			
+			# TODO: Check if we have an immediate exit, and replace "Fade" appropriately.
+			var exitType = null
+			if immediateExit == false:
+				exitType = "Fade"
+			
+			# Remove the speakers.
+			if speakerToRemove2 == null:
+				removeSpeakerDefinition([speakerToRemove1, exitType])
+			elif speakerToRemove3 == null:
+				removeSpeakerDefinition([speakerToRemove1, exitType], [speakerToRemove2, exitType])
+			else:
+				removeSpeakerDefinition([speakerToRemove1, exitType], [speakerToRemove2, exitType], [speakerToRemove3, exitType])
+		
+		else:
+			animationTextbox.play("Exiting")
+			# Taking away the background shade
+			if backgroundShade:
+				animationShade.play("Exiting")
 	else:
 		# Let's check if we have dialogue or a speaker change/addition/removal.
 		if dialogueList[0][0] == "Dialogue":
@@ -383,6 +446,9 @@ func setUpDialogue():
 			addSoundDefinition(dialogueList[0][1])
 		elif dialogueList[0][0] == "addSpeakerEffect":
 			addSpeakerEffectDefinition(dialogueList[0][1], dialogueList[0][2])
+		elif dialogueList[0][0] == "addCallable":
+			addCallableDefinition(dialogueList[0][1])
+
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -1376,7 +1442,8 @@ func addSoundDefinition(sound: String):
 	soundBankExtra.play()
 	setUpDialogue()
 		
-func toggleFade(fadeColor = "Black", fadeType = 0):
+
+func toggleFade(fadeColor = "Black", fadeType = "Background"):
 	# Convert our fade colors to values.
 	if fadeColor is String:
 		if fadeColor.to_upper() == "WHITE":
@@ -1434,8 +1501,15 @@ func addSpeakerEffect(setName: String, effect):
 			effect = 3
 		elif effect.to_upper() == "SHARD" or effect.to_upper() == "EMERALD_SHARD":
 			effect = 4
-		elif effect.to_upper() == "SHAKE" or effect.to_upper() == "DAMAGE" or effect.to_upper() == "DESTROY":
+		elif effect.to_upper() == "LIGHT_HIT" or effect.to_upper() == "MINOR_HIT" or effect.to_upper() == "LIGHT HIT" or effect.to_upper() == "MINOR HIT" or effect.to_upper() == "HIT":
 			effect = 5
+		elif effect.to_upper() == "HEAVY_HIT" or effect.to_upper() == "MAJOR_HIT" or effect.to_upper() == "HEAVY HIT" or effect.to_upper() == "MAJOR HIT" or effect.to_upper() == "CRITICAL_HIT":
+			effect = 6
+		elif effect.to_upper() == "SHAKE" or effect.to_upper() == "DAMAGE":
+			effect = 7
+		else:
+			print("Invalid effect! Reverting to the default ALERT.")
+			effect = 0
 	
 	# Append this to our dialogue list.
 	dialogueList.append(["addSpeakerEffect", setName, effect])
@@ -1480,14 +1554,18 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		
 		await animationSpeakerEffect.animation_finished
 		spriteSpeakerEffect.visible = false
+		animationPlaying = false
+		setUpDialogue()
 	elif effect == 2:
-		# TODO: play appropriate sound (see end of Amy's story)
 		animationSpeakerEffect.play("Love")
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 51, speaker.global_position.y + 78)
 		spriteSpeakerEffect.visible = true
 		tween.tween_property(spriteSpeakerEffect, "global_position:y", -12, 3)
 		# Would've done this related to time, but we can't really do that here.
 		# Maybe this could be optimized lol
+		
+		soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialogueLove.wav")
+		soundBankExtra.play()
 		
 		# We have to create another tween specifically for our X position.
 		var tweenX = create_tween()
@@ -1503,14 +1581,16 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		tweenX.tween_property(spriteSpeakerEffect, "global_position:x", (spriteSpeakerEffect.global_position.x + 10) - 10, ((3.0/4)/2))
 		
 		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
+		tween.tween_callback(changeAnimationPlaying)
+		tween.tween_callback(setUpDialogue)
 	elif effect == 3 or effect == 4:
-		# TODO: Emerald effects
-		# TODO: initial go-down goes to 225 frames or 3.75 secs
 		match effect:
 			3:
 				animationSpeakerEffect.play("Emerald")
 			4:
 				animationSpeakerEffect.play("Emerald Shard")
+		soundBankExtra.stream = load("res://assets/audio/sfx/Dialogue/DialogueEmerald.wav")
+		soundBankExtra.play()
 		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, -16)
 		tween.tween_property(spriteSpeakerEffect, "global_position:y", speaker.global_position.y + 64, 3.75)
 		spriteSpeakerEffect.visible = true
@@ -1518,10 +1598,52 @@ func addSpeakerEffectDefinition(setName: String, effect: int):
 		tween.tween_property(spriteSpeakerEffect, "scale", Vector2(0, 0), 0.25)
 		tween.tween_property(spriteSpeakerEffect, "visible", false, 0)
 		tween.tween_property(spriteSpeakerEffect, "scale", Vector2(1, 1), 0)
+		tween.tween_callback(changeAnimationPlaying)
+		tween.tween_callback(setUpDialogue)
+	elif effect == 5 or effect == 6:
+		match effect:
+			5:
+				animationSpeakerEffect.play("Light Hit")
+			6:
+				animationSpeakerEffect.play("Heavy Hit")
+		
+		spriteSpeakerEffect.global_position = Vector2(speaker.global_position.x + 48, 95)
+		spriteSpeakerEffect.visible = true
+		
+		await animationSpeakerEffect.animation_finished
+		spriteSpeakerEffect.visible = false
+		animationPlaying = false
+		setUpDialogue()
+	elif effect == 7:
+		if speaker == speaker1:
+			speaker1Shaking = true
+		elif speaker == speaker2:
+			speaker2Shaking = true
+		elif speaker == speaker3:
+			speaker3Shaking = true
+		tween.tween_interval(1)
+		tween.tween_callback(changeSpeakerShaking)
+		tween.tween_callback(changeAnimationPlaying)
+		tween.tween_callback(setUpDialogue)
 	
-	tween.tween_callback(changeAnimationPlaying)
-	tween.tween_callback(setUpDialogue)
-	
+func changeSpeakerShaking():
+	if speaker1Shaking == true:
+		speaker1Shaking = false
+		speaker1.global_position = speakerReferencePosition
+	elif speaker2Shaking == true:
+		speaker2Shaking = false
+		speaker2.global_position = speakerReferencePosition
+	elif speaker3Shaking == true:
+		speaker3Shaking = false
+		speaker3.global_position = speakerReferencePosition
+	speakerReferencePosition = null
+
+func addCallable(callable: Callable):
+	dialogueList.append(["addCallable", callable])
+
+func addCallableDefinition(callable: Callable):
+	callable.call()
+	setUpDialogue()
 
 # Animations for the textbox.
 func _on_animation_player_animation_finished(anim_name):
