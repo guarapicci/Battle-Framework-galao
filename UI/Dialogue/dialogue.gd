@@ -1452,7 +1452,7 @@ func toggleFade(fadeColor = "Black", fadeType = "Background"):
 			fadeColor = 0
 	
 	if fadeType is String:
-		if fadeColor.to_upper() == "FOREGROUND":
+		if fadeType.to_upper() == "FOREGROUND":
 			fadeType = 1
 		else:
 			fadeType = 0
