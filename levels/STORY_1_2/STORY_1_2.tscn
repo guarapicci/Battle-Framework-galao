@@ -1,0 +1,193 @@
+[gd_scene format=3 uid="uid://8x1l5viisslq"]
+
+[ext_resource type="Script" uid="uid://bb7p7bs82c3uv" path="res://levels/STORYMAP_3D/storymap_3d.gd" id="1_wrj6o"]
+[ext_resource type="PackedScene" uid="uid://dgswtfbyqn45x" path="res://components/camera_root/camera_root.tscn" id="4_gcplf"]
+[ext_resource type="PackedScene" uid="uid://1q41upvf2gpk" path="res://characters/sonic/sonic.tscn" id="5_gbl62"]
+[ext_resource type="PackedScene" uid="uid://dj26sacnhty4r" path="res://addons/devblocks/blocks/basic_block.tscn" id="6_cgg68"]
+[ext_resource type="Texture2D" uid="uid://dek0hhcumyxfb" path="res://addons/devblocks/textures/dark/texture_01.png" id="6_nvqsj"]
+[ext_resource type="PackedScene" uid="uid://c6epltatnawp7" path="res://levels/tails_gigalab/moyaiplane.glb" id="6_qcksr"]
+[ext_resource type="Texture2D" uid="uid://dpaq2kq3827tv" path="res://addons/devblocks/textures/purple/texture_04.png" id="7_wecoc"]
+[ext_resource type="Texture2D" uid="uid://exv4fuaiiy1j" path="res://addons/devblocks/textures/dark/texture_04.png" id="7_wwn6s"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o0to3"]
+size = Vector3(16, 0.2109375, 19.870605)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xvlff"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wwn6s"]
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(24.379324, 4.9368567, 12.079897)
+uv1_offset = Vector3(1, 0.75, 1)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nvqsj"]
+shading_mode = 0
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(6.8262105, 4.9368567, 25.005388)
+uv1_offset = Vector3(0.75, 0.75, 0.5)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l56iy"]
+shading_mode = 0
+albedo_texture = ExtResource("7_wwn6s")
+uv1_scale = Vector3(21.141758, 1.0008491, 5.001077)
+uv1_offset = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wecoc"]
+shading_mode = 0
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(20.478632, 0.98737127, 5.001077)
+uv1_offset = Vector3(1, 0.75, 0.5)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pl306"]
+shading_mode = 0
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(20.478632, 0.98737127, 11.552487)
+uv1_offset = Vector3(1, 0.75, 0.25)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ctpoa"]
+shading_mode = 0
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(20.478632, 4.996099, 0.92419887)
+uv1_offset = Vector3(1, 0.25, 0.75)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4t70e"]
+shading_mode = 0
+albedo_texture = ExtResource("6_nvqsj")
+uv1_scale = Vector3(20.478632, 0.98737127, 5.001077)
+uv1_offset = Vector3(1, 0.75, 0.5)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2i6bt"]
+shading_mode = 0
+albedo_texture = ExtResource("7_wecoc")
+uv1_scale = Vector3(226.24905, 0.4973667, 158.39189)
+uv1_offset = Vector3(1, 0.75, 1)
+uv1_triplanar = true
+
+[node name="Node3D5" type="Node3D" unique_id=1988815531]
+script = ExtResource("1_wrj6o")
+
+[node name="Stage world" type="Node" parent="." unique_id=913111997]
+
+[node name="CameraRoot" parent="Stage world" unique_id=1988223040 instance=ExtResource("4_gcplf")]
+
+[node name="Pivot" parent="Stage world/CameraRoot" index="2"]
+transform = Transform3D(-1, -1.4541196e-06, 2.076699e-06, 0, 0.819152, 0.5735761, -2.5351817e-06, 0.5735761, -0.819152, 0, 9, 36)
+
+[node name="Camera" parent="Stage world/CameraRoot/Pivot" index="0"]
+transform = Transform3D(1, -1.2534518e-13, -4.3713104e-13, -1.7480102e-13, 0.7814559, -0.6239611, 4.1980907e-13, 0.6239611, 0.7814559, 1.4159012, -2.275097, 13.568058)
+projection = 0
+fov = 8.9
+
+[node name="Node3D" type="Node3D" parent="Stage world" unique_id=1859493501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2013836, -1.2280936, 0.9125109)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Stage world/Node3D" unique_id=1703372352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.3897371, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Stage world/Node3D/StaticBody3D" unique_id=823168863]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.513033, -1.1253918, -6.052002)
+shape = SubResource("BoxShape3D_o0to3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Stage world/Node3D/StaticBody3D" unique_id=467598680]
+transform = Transform3D(16.32, 0, 0, 0, 1, 0, 0, 0, 14.2560005, 1, -1.441664, -3)
+mesh = SubResource("BoxMesh_xvlff")
+
+[node name="Node3D2" type="Node3D" parent="Stage world" unique_id=877301553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.525677, 0.90656525, -12.155317)
+
+[node name="Node3D3" type="Node3D" parent="Stage world" unique_id=1014191456]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5705752, 0.93204004, 1.797709)
+
+[node name="Node3D4" type="Node3D" parent="Stage world" unique_id=28872612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4177697, 0.9365427, -1.6846395)
+
+[node name="main player" parent="Stage world" unique_id=196693236 groups=["hub world interactive"] instance=ExtResource("5_gbl62")]
+unique_name_in_owner = true
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -13.142562, 1, -11.952229)
+
+[node name="moyaiplane" parent="." unique_id=1397143913 instance=ExtResource("6_qcksr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7204347, 2.0551476, -13.877628)
+
+[node name="Icosphere" parent="moyaiplane" index="0" unique_id=1192795583]
+transform = Transform3D(0.849659, 0, 1.1126902, 0, 1.4, 0, -1.1126902, 0, 0.849659, 2.1353283, 0, -8.739247)
+
+[node name="Plane" parent="moyaiplane" index="1" unique_id=969145800]
+transform = Transform3D(-18.177643, 0, 0, 0, -18.177643, 0, 0, 0, -18.177643, 0, -1.9119163, 0)
+visible = false
+
+[node name="StaticBody3D" parent="moyaiplane/Plane" index="0" unique_id=948180841]
+collision_layer = 0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=430491313]
+transform = Transform3D(0.38917002, 0.79874796, -0.45885566, -0.66143113, 0.5889999, 0.46431434, 0.6411363, 0.12280418, 0.75753796, 0, 7.5599084, 0)
+light_color = Color(0.81, 0.61749, 0.3078, 1)
+light_energy = 0.22
+shadow_enabled = true
+
+[node name="BasicBlock" parent="." unique_id=1872880054 instance=ExtResource("6_cgg68")]
+transform = Transform3D(24.379324, 0, 0, 0, 4.9368567, 0, 0, 0, 12.079897, -10.762108, -2.135069, -10.759323)
+
+[node name="Mesh" parent="BasicBlock" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_wwn6s")
+
+[node name="BasicBlock3" parent="." unique_id=1561728582 instance=ExtResource("6_cgg68")]
+transform = Transform3D(6.8262105, 0, 0, 0, 4.9368567, 0, 0, 0, 25.005388, 9.237892, -2.135069, -10.759323)
+
+[node name="Mesh" parent="BasicBlock3" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_nvqsj")
+
+[node name="BasicBlock8" parent="." unique_id=465911831 instance=ExtResource("6_cgg68")]
+transform = Transform3D(20.421371, -0.2590389, 0, 5.4718885, 0.966746, 0, 0, 0, 5.001077, 22.237892, 1.8649311, -20.759323)
+block_style = 3
+
+[node name="Mesh" parent="BasicBlock8" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_l56iy")
+
+[node name="BasicBlock4" parent="." unique_id=1914509766 instance=ExtResource("6_cgg68")]
+transform = Transform3D(20.478632, 0, 0, 0, 0.98737127, 0, 0, 0, 5.001077, 42.237892, 4.864931, -20.759323)
+
+[node name="Mesh" parent="BasicBlock4" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_wecoc")
+
+[node name="BasicBlock6" parent="." unique_id=1808948341 instance=ExtResource("6_cgg68")]
+transform = Transform3D(20.478632, 0, 0, 0, 0.98737127, 0, 0, 0, 11.552487, 42.237892, -0.1350689, -13.759323)
+
+[node name="Mesh" parent="BasicBlock6" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_pl306")
+
+[node name="BasicBlock7" parent="." unique_id=900539683 instance=ExtResource("6_cgg68")]
+transform = Transform3D(20.478632, 0, 0, 0, 4.996099, 0, 0, 0, 0.92419887, 42.237892, 1.8649311, -18.759323)
+
+[node name="Mesh" parent="BasicBlock7" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_ctpoa")
+
+[node name="BasicBlock5" parent="." unique_id=661536147 instance=ExtResource("6_cgg68")]
+transform = Transform3D(20.478632, 0, 0, 0, 0.98737127, 0, 0, 0, 5.001077, 21.237892, -0.1350689, -1.7593231)
+
+[node name="Mesh" parent="BasicBlock5" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_4t70e")
+
+[node name="BasicBlock2" parent="." unique_id=417746974 instance=ExtResource("6_cgg68")]
+transform = Transform3D(226.24905, 0, 0, 0, 0.4973667, 0, 0, 0, 158.39189, -10.762108, -2.135069, -0.25743484)
+block_color_group = 4
+block_style = 3
+
+[node name="Mesh" parent="BasicBlock2" index="1" unique_id=2097480429]
+surface_material_override/0 = SubResource("StandardMaterial3D_2i6bt")
+
+[editable path="Stage world/CameraRoot"]
+[editable path="moyaiplane"]
+[editable path="BasicBlock"]
+[editable path="BasicBlock3"]
+[editable path="BasicBlock8"]
+[editable path="BasicBlock4"]
+[editable path="BasicBlock6"]
+[editable path="BasicBlock7"]
+[editable path="BasicBlock5"]
+[editable path="BasicBlock2"]

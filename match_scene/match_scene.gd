@@ -1,9 +1,9 @@
 extends Node3D
 class_name MatchScene
 
-# This scene hosts a match. Whatever level was selected will be loaded for it,
-# and the match will provide the level with whatever it needs 
-# (player data, input, scripts, etc.)
+## This scene hosts a match. Whatever level was selected will be loaded for it,
+## and the match will provide the level with whatever it needs 
+## (player data, input, scripts, etc.)
 
 
 # For some unknown reason, these nodes are loaded from the script instead of

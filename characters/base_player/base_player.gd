@@ -4,6 +4,11 @@ class_name BattleCharacter
 @export var character_info: CharacterInfo
 @export var IS_CLIENTSIDE = false
 
+# EXTERNAL VARIABLES
+# For control by a single pupeteer, proxy or a parent.
+## Wether this character will react to player input.
+var input_enabled: bool = true
+
 # Character stats, will be set from character_info resource
 var max_hp: float
 var move_speed: float 
@@ -521,6 +526,12 @@ func is_action_enabled(action: String):
 ## Input helper function to get input for the current player
 ## In the future this will also retrieve inputs received over the network (for online play)
 func input(action: StringName, type: String = "pressed") -> bool:
+	
+	# Check if for some reason the player is not allowed to control
+	# the character (for cutscenes, freeze and overall pause conditions)
+	if (not input_enabled):
+		return false
+	
 	# Gets the correct action based on the player number (ex: attack1, attack2, attack3, etc.)
 	var player_action = action + str(player_id)
 	if !InputMap.has_action(player_action):

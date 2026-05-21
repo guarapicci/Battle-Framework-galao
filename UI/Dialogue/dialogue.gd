@@ -1,10 +1,15 @@
-extends Control
+class_name DialogueSequence extends Control
+
 ## A dialogue system set up like that of Sonic Battle (GBA).
 ## When instantiating this node, there are certain variables you can set before
 ## you make the dialogue appear as a child.
 ##
+## To use this, simply drag and drop this Scene from the file system
+## into the map you want to use the dialogue in.
+
 ## To use this, please refer to this helpful documentation below:
 ## https://docs.google.com/document/d/1e6PvMSDok5-YuAbXsFArWQJNcP8_r0e_bSD1uH1ZSZI/edit?usp=sharing
+
 ##
 ## Created by ShinySkink9185, being borrowed from Klonoa Project Test.
 ## I hope Mobi doesn't mind me shilling it...!
@@ -75,6 +80,7 @@ var speaker1Entering = false
 var speaker2Entering = false
 var speaker3Entering = false
 
+
 var speaker1Shaking = false
 var speaker2Shaking = false
 var speaker3Shaking = false
@@ -115,8 +121,10 @@ func _init(setBackgroundShade: bool = true, setImmediateEnter: bool = false, set
 	defineSpeaker("Eggman", "res://characters/eggman/sprites/EggmanDialoguePortraits.png", ["Standard", "Angry"], "res://assets/audio/sfx/Dialogue/DialogueRegular.wav")
 	# NOTICE: Feel free to add your own speakers under this if you want to!
 	
+
 	# TODO: figure out whole screen shaking (e.g. Amy's fit with Emerl & Phi)
 	# ...I'm letting you figure that one out with addCallable, LOL
+
 	
 	# Set our parameters for instantiation.
 	backgroundShade = setBackgroundShade
@@ -150,6 +158,7 @@ func _physics_process(delta):
 			justStarted = false
 		return
 	
+
 	# Shake the speaker.
 	var speakerShaking = null
 	
@@ -266,6 +275,7 @@ func _physics_process(delta):
 			tween.tween_callback(setUpDialogue)
 		else:
 			# Speed up the text.
+
 			if dialogueList != []:
 				if dialogueList[0][0] == "Dialogue" and animationPlaying == false:
 					goingFast = true
@@ -286,6 +296,7 @@ func setUpDialogue():
 	# Remove speed-up mode and the pointer.
 	goingFast = false
 	dialoguePointer.position.x = -32
+
 	# If that's all the dialogue, remove the textbox if we don't have any speakers.
 	if not dialogueList:
 		# Get the names of all of our Speakers that we're removing beforehand.
@@ -437,6 +448,7 @@ func setUpDialogue():
 			addSpeakerEffectDefinition(dialogueList[0][1], dialogueList[0][2])
 		elif dialogueList[0][0] == "addCallable":
 			addCallableDefinition(dialogueList[0][1])
+
 	
 
 # Adds a DialogueEntry class that stores all the info of a single piece of dialogue
@@ -1430,6 +1442,7 @@ func addSoundDefinition(sound: String):
 	soundBankExtra.play()
 	setUpDialogue()
 		
+
 func toggleFade(fadeColor = "Black", fadeType = "Background"):
 	# Convert our fade colors to values.
 	if fadeColor is String:

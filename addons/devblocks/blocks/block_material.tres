@@ -1,6 +1,7 @@
 [gd_resource type="StandardMaterial3D" format=3 uid="uid://bovtf6na6r6ow"]
 
 [resource]
+shading_mode = 0
 uv1_scale = Vector3(100, 1, 100)
 uv1_offset = Vector3(1, 0.5, 1)
 uv1_triplanar = true

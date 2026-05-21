@@ -126,6 +126,7 @@ position = Vector2(200, 84)
 frame_progress = 0.140587
 
 [node name="touchscreen gamepad" parent="." unique_id=1223920270 instance=ExtResource("17_rufb7")]
+visible = false
 layout_mode = 1
 
 [node name="ModeChangeSound" type="AudioStreamPlayer" parent="." unique_id=1684953712]

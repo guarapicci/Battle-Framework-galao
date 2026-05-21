@@ -44,6 +44,7 @@ size_flags_vertical = 3
 script = ExtResource("2_qxr2g")
 
 [node name="Control" type="Control" parent="." unique_id=1548067884]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 scale = Vector2(2, 2)

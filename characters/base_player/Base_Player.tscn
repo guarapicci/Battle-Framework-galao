@@ -55,7 +55,7 @@ size = Vector3(0.188656, 0.317568, 0.231695)
 
 [node name="BasePlayer" type="CharacterBody3D" unique_id=1814098274 groups=["characters"]]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
-collision_layer = 0
+collision_layer = 1048576
 slide_on_ceiling = false
 floor_snap_length = 0.16
 safe_margin = 0.016
