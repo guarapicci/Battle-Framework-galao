@@ -107,10 +107,10 @@ transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, -13.142562, 1, -11.952229)
 [node name="moyaiplane" parent="." unique_id=1397143913 instance=ExtResource("4_lfs2o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.077242, 2.0551476, 7.1405635)
 
-[node name="Icosphere" parent="moyaiplane" index="0" unique_id=1840240467]
+[node name="Icosphere" parent="moyaiplane" index="0" unique_id=1192795583]
 transform = Transform3D(0.849659, 0, 1.1126902, 0, 1.4, 0, -1.1126902, 0, 0.849659, -3.0066466, 0.91730165, -8.006585)
 
-[node name="Plane" parent="moyaiplane" index="1" unique_id=1513861282]
+[node name="Plane" parent="moyaiplane" index="1" unique_id=969145800]
 transform = Transform3D(-18.177643, 0, 0, 0, -18.177643, 0, 0, 0, -18.177643, 0, -6.667137, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=430491313]

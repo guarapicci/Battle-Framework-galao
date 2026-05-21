@@ -20,7 +20,6 @@ extends Node3D
 @onready var dialogue_blueprint: PackedScene = preload("res://UI/Dialogue/dialogue.tscn")
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	
 	var camera_pivot = camera.get_node("Pivot")
 	var inner_camera = camera.get_node("Pivot/Camera")
 	
